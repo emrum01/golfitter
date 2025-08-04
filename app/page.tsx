@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Upload, User, Target, Activity, BarChart3, ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SwingAnalysis from '@/components/swing-analysis';
 import { MobileVideoPlayer } from '@/components/mobile-video-player';
@@ -183,7 +184,7 @@ function GolfFitter() {
       setUserData(JSON.parse(savedUserData));
       setCurrentStep('results');
     }
-  }, []);
+  }, [currentStep]);
 
   const handleSubmit = () => {
     const match = findBestMatch(userData);

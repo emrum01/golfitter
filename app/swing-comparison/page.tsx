@@ -27,12 +27,6 @@ export default function SwingComparisonPage() {
     setError(null);
   };
 
-  const handleAnalyze = () => {
-    setIsLoading(true);
-    setError(null);
-    setAnalysisResult(null);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <SwingComparison

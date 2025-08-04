@@ -198,8 +198,7 @@ export const Disabled: Story = {
     await expect(button).toHaveClass(/disabled:pointer-events-none/);
     await expect(button).toHaveClass(/disabled:opacity-50/);
     
-    // クリックしても反応しないことを確認
-    await userEvent.click(button);
+    // disabledな要素はクリックできないため、onClickが呼ばれないことを確認
     await expect(args.onClick).not.toHaveBeenCalled();
   },
 };

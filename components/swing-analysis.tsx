@@ -55,11 +55,13 @@ interface SwingAnalysisResult {
 interface SwingAnalysisProps {
   onBack: () => void;
   matchedProName?: string;
+  onNavigateToUpload?: () => void;
 }
 
 export default function SwingAnalysis({
   onBack,
   matchedProName = '田中 太郎',
+  onNavigateToUpload,
 }: SwingAnalysisProps) {
   const router = useRouter();
   const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
@@ -113,7 +115,7 @@ export default function SwingAnalysis({
     if (!uploadedVideo) return;
     
     try {
-      const videoId = await videoStorage.saveVideo(uploadedVideo);
+      await videoStorage.saveVideo(uploadedVideo);
       await loadSavedVideos();
       alert('動画が保存されました');
     } catch (error) {
@@ -262,7 +264,7 @@ export default function SwingAnalysis({
                     )}
                     <Button
                       variant="link"
-                      onClick={() => router.push('/swing-upload')}
+                      onClick={() => onNavigateToUpload ? onNavigateToUpload() : router.push('/swing-upload')}
                       className="block"
                     >
                       <FolderOpen className="w-4 h-4 mr-2 inline" />

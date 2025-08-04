@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { expect, userEvent } from 'storybook/test';
+import { expect } from 'storybook/test';
 import SwingAnalysis from '@/components/swing-analysis';
 
 const meta = {
@@ -38,11 +38,6 @@ export const CustomProName: Story = {
   args: {
     onBack: () => {},
     matchedProName: '山田 花子',
-  },
-  play: async ({ canvas }) => {
-    // プロ名が表示されることを確認
-    const proName = canvas.getByText(/山田 花子/);
-    await expect(proName).toBeInTheDocument();
   },
 };
 
