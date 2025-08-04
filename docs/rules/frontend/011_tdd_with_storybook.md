@@ -24,7 +24,7 @@ TDDの基本原則とメリットについては、[TDDとTidy First開発ガイ
    # 2. play関数で失敗するテストを記述（下記テンプレート参照）
    
    # 3. Storybookを起動して失敗を確認
-   pnpm storybook:crm  # または pnpm storybook:cus
+   npm run storybook
    ```
 
 2. **🟢 GREEN Phase - 最小限の実装**
@@ -34,27 +34,24 @@ TDDの基本原則とメリットについては、[TDDとTidy First開発ガイ
    
    # 2. テストを通す最小限の実装を記述
    
-   # 3. 変更したファイルのテストが通ることを確認（--runで一度だけ実行）
-   pnpm vitest:crm ComponentName.stories --run  # CRM用
-   # または
-   pnpm vitest:cus ComponentName.stories --run  # Customer用
+   # 3. 変更したファイルのテストが通ることを確認
+   npm run test -- ComponentName.stories
    
    # 注: vitestはファイル名のパターンマッチングを使用
    # より具体的に指定する場合:
-   # pnpm vitest:crm src/components/ComponentName/ComponentName.stories --run
+   # npm run test -- src/components/ComponentName/ComponentName.stories
    ```
 
 3. **🔵 REFACTOR Phase - 構造の改善**
    ```bash
    # 1. コードの品質を改善
    
-   # 2. 各変更後に該当ファイルのテストを実行（--runで一度だけ実行）
-   pnpm vitest:crm ComponentName.stories --run  # CRM用
-   # または
-   pnpm vitest:cus ComponentName.stories --run  # Customer用
+   # 2. 各変更後に該当ファイルのテストを実行
+   npm run test -- ComponentName.stories
    
    # 3. 全体の品質チェック
-   pnpm validate  # lint:fix + fix:prettier + check-types
+   npm run lint  # Lintチェック
+   npm run build  # 型チェック（ビルド時に実行）
    ```
 
 **注意:** 各フェーズの詳細な説明は[TDDガイド](/docs/development/tdd-guide.md)を参照
@@ -320,35 +317,28 @@ export const UserJourney: Story = {
 
 ```bash
 # 型チェック
-pnpm check-types
+npm run build  # Next.jsのビルドで型チェックが実行される
 
 # Lint
-pnpm lint
+npm run lint
 
-# Lint自動修正
-pnpm lint:fix
+# Storybookの起動
+npm run storybook
 
-# Prettierチェック
-pnpm lint:prettier
+# Storybookのビルド
+npm run build-storybook
 
-# Prettier自動修正
-pnpm fix:prettier
+# テストの実行（単発実行）
+npm run test -- ComponentName.stories  # 特定ファイルのみ実行
 
-# 一括検証（lint:fix + fix:prettier + check-types）
-pnpm validate
+# テストのウォッチモード
+npm run test:watch
 
-# Storybookの起動（CRM用）
-pnpm storybook:crm
-
-# Storybookの起動（Customer用）
-pnpm storybook:cus
-
-# テストの実行（特定ファイルのみ、--runで一度だけ実行）
-pnpm vitest:crm ComponentName.stories --run  # CRM用（ファイル名パターンマッチング）
-pnpm vitest:cus ComponentName.stories --run  # Customer用（ファイル名パターンマッチング）
+# テストUIモード
+npm run test:ui
 
 # 全テストの実行
-pnpm test  # すべてのテストを実行する場合（CI環境では自動的に--runモード）
+npm run test
 ```
 
 #### チェックリスト
@@ -437,16 +427,16 @@ Storybookを使用したTDD実践時の推奨事項
 - [ ] **🔴 RED Phase**
   - [ ] Storybookファイル（.stories.tsx）を作成した
   - [ ] play関数でテストを書いた
-  - [ ] `pnpm storybook:crm`でテストが失敗することを確認した
+  - [ ] `npm run storybook`でテストが失敗することを確認した
 
 - [ ] **🟢 GREEN Phase**
   - [ ] コンポーネントファイル（.tsx）を作成した
   - [ ] 最小限の実装をした
-  - [ ] `pnpm vitest:crm ComponentName.stories --run`でテストが通ることを確認した
+  - [ ] `npm run test -- ComponentName.stories`でテストが通ることを確認した
 
 - [ ] **🔵 REFACTOR Phase**
   - [ ] コードの品質を改善した
-  - [ ] `pnpm validate`で品質チェックを実行した
+  - [ ] `npm run lint`と`npm run build`で品質チェックを実行した
   - [ ] すべてのテストが通ることを確認した
 
 #### 最終確認
