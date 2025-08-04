@@ -19,43 +19,41 @@
 
 **ルール:**
 
-- API の型定義は`@gen`パッケージから取得する
-- 独自の型定義を作成せず、生成された型を使用する
-- `next/api`からの型インポートは禁止
-- Protocol Buffers のメッセージは PlainMessage を使用
+- Supabase の型定義は `types/supabase.ts` から取得する
+- API レスポンスの型は適切に定義する
+- Zod を使用してランタイム型検証を行う
+- 型の重複を避け、一元管理する
 
-### Protocol Buffers 型の使用
+### Supabase 型の使用
 
 **説明:**
-Protocol Buffers の型を安全に使用するためのルール
+Supabase の型を安全に使用するためのルール
 
 **ルール:**
 
-- メッセージ型は PlainMessage として扱う
-- 列挙型はそのまま使用する
-- オプショナルフィールドは undefined チェックを行う
-- 配列フィールドは必ず空の配列でチェックする
+- データベース型は `Database` 型から取得
+- テーブルの Row/Insert/Update 型を適切に使い分ける
+- オプショナルフィールドの null チェックを必ず行う
+- 関係性の型は明示的に定義する
 
 **例:**
 
 ```typescript
-import { Customer, ExaminationStatus } from '@tenet-app/gen/admin/v1/customer_pb';
-import type { PlainMessage } from '@bufbuild/protobuf';
+import { Database } from '@/types/supabase';
 
-// PlainMessageを使用してProto型を扱う
-type CustomerProps = {
-  customer: PlainMessage<Customer>;
-  status: ExaminationStatus;
-};
+// テーブルの型を取得
+type Profile = Database['public']['Tables']['profiles']['Row'];
+type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
+type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 
 // オプショナルフィールドの取り扱い
-const getName = (customer: PlainMessage<Customer>): string => {
-  return customer.name ?? '名称未設定';
+const getDisplayName = (profile: Profile): string => {
+  return profile.display_name ?? '名前未設定';
 };
 
-// 配列フィールドの取り扱い
-const getExaminations = (customer: PlainMessage<Customer>) => {
-  return customer.examinations ?? [];
+// 関係性の型定義
+type ProfileWithSwingData = Profile & {
+  swing_analyses: Array<Database['public']['Tables']['swing_analyses']['Row']>;
 };
 ```
 
@@ -74,20 +72,30 @@ const getExaminations = (customer: PlainMessage<Customer>) => {
 **例:**
 
 ```typescript
-import { Customer } from '@tenet-app/gen/admin/v1/customer_pb';
-import type { PlainMessage } from '@bufbuild/protobuf';
+import { Database } from '@/types/supabase';
 
 // 基本の型
-type CustomerBasic = PlainMessage<Customer>;
+type User = Database['public']['Tables']['users']['Row'];
 
 // Pickを使って必要なプロパティのみを選択
-type CustomerSummary = Pick<CustomerBasic, 'id' | 'name' | 'phoneNumber'>;
+type UserSummary = Pick<User, 'id' | 'email' | 'created_at'>;
 
 // Omitを使って特定のプロパティを除外
-type CustomerWithoutHistory = Omit<CustomerBasic, 'examinationHistory'>;
+type UserWithoutTimestamps = Omit<User, 'created_at' | 'updated_at'>;
 
 // Partialを使ってすべてのプロパティをオプショナルに
-type CustomerUpdateRequest = Partial<CustomerSummary>;
+type UserUpdateRequest = Partial<UserSummary>;
+
+// カスタム型の定義
+interface SwingAnalysisResult {
+  score: number;
+  strengths: string[];
+  improvements: Array<{
+    point: string;
+    suggestion: string;
+    priority: 'high' | 'medium' | 'low';
+  }>;
+}
 ```
 
 ### 型安全性の確保
