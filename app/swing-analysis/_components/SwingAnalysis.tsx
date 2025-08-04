@@ -52,15 +52,9 @@ interface SwingAnalysisResult {
   strengths: string[];
 }
 
-interface SwingAnalysisProps {
-  onBack: () => void;
-  matchedProName?: string;
-}
 
-export default function SwingAnalysis({
-  onBack,
-  matchedProName = '田中 太郎',
-}: SwingAnalysisProps) {
+export default function SwingAnalysis() {
+  const matchedProName = '田中 太郎';
   const router = useRouter();
   const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string>('');
@@ -113,7 +107,7 @@ export default function SwingAnalysis({
     if (!uploadedVideo) return;
     
     try {
-      const videoId = await videoStorage.saveVideo(uploadedVideo);
+      await videoStorage.saveVideo(uploadedVideo);
       await loadSavedVideos();
       alert('動画が保存されました');
     } catch (error) {
@@ -546,8 +540,8 @@ export default function SwingAnalysis({
         )}
 
         <div className="flex justify-center gap-4">
-          <Button onClick={onBack} variant="outline">
-            診断結果に戻る
+          <Button onClick={() => router.push('/')} variant="outline">
+            ホームに戻る
           </Button>
           {analysisResult && (
             <Button className="bg-green-600 hover:bg-green-700">
