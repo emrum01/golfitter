@@ -197,11 +197,7 @@ export const ProgressBarInteraction: Story = {
     const progressContainer = progressBar.parentElement;
     if (progressContainer) {
       // プログレスバーの中央をクリック
-      const rect = progressContainer.getBoundingClientRect();
-      await userEvent.click(progressContainer, {
-        clientX: rect.left + rect.width / 2,
-        clientY: rect.top + rect.height / 2,
-      });
+      await userEvent.click(progressContainer);
       
       // ビデオの再生位置が変更されたことを確認
       const video = canvas.getByRole('application') as HTMLVideoElement;
