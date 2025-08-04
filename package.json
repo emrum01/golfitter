@@ -11,7 +11,8 @@
     "build-storybook": "storybook build",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:watch": "vitest --watch"
+    "test:watch": "vitest --watch",
+    "sync:claude-cursor": "node scripts/sync-claude-cursor.js"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
