@@ -444,7 +444,7 @@ function GolfFitter() {
               >
                 スイング分析
               </Button>
-              <Link href="/swing-comparison">
+              <Link href={`/swing-comparison?video2=${currentVideoIndex === 0 ? 'test.mp4' : 'test2.mp4'}&proName=${matchedPro.name}`}>
                 <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 border-2 border-red-500">
                   <BarChart3 className="w-4 h-4 mr-2" />
                   スイング比較

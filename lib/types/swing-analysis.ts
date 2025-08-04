@@ -30,6 +30,8 @@ export interface SwingComparisonProps {
   isLoading?: boolean;
   analysisResult?: AnalysisResult | null;
   error?: string | null;
+  presetVideo2?: string;
+  presetVideo2Name?: string;
 }
 
 export interface VideoUploadState {

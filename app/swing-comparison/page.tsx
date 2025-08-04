@@ -11,6 +11,10 @@ export default function SwingComparisonPage() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // URLパラメータから動画2の情報を取得
+  const video2Param = searchParams.get('video2');
+  const proNameParam = searchParams.get('proName');
 
   const handleBack = () => {
     // 診断結果画面に戻る（currentStep=resultsパラメータ付き）
@@ -37,6 +41,8 @@ export default function SwingComparisonPage() {
         isLoading={isLoading}
         analysisResult={analysisResult}
         error={error}
+        presetVideo2={video2Param ? `/videos/${video2Param}` : undefined}
+        presetVideo2Name={proNameParam ? `${proNameParam}のスイング` : undefined}
       />
     </div>
   );
