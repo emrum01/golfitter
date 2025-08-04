@@ -1,0 +1,42 @@
+# lefthook.yml
+# Git hooks設定ファイル
+
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: "*.{js,jsx,ts,tsx}"
+      run: npm run lint
+    
+    typecheck:
+      run: npm run typecheck || true
+    
+    test:
+      run: npm run test -- --run
+      
+commit-msg:
+  commands:
+    commitlint:
+      run: |
+        # コミットメッセージの形式をチェック
+        commit_regex='^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?: .{1,}$'
+        commit_msg=$(cat {1})
+        if ! echo "$commit_msg" | grep -qE "$commit_regex"; then
+          echo "コミットメッセージが規約に従っていません。"
+          echo "形式: <type>(<scope>): <subject>"
+          echo "例: feat: 新機能を追加"
+          echo ""
+          echo "使用可能なtype:"
+          echo "  feat:     新機能"
+          echo "  fix:      バグ修正"
+          echo "  docs:     ドキュメントのみの変更"
+          echo "  style:    コードの意味に影響しない変更（空白、フォーマット、セミコロンなど）"
+          echo "  refactor: バグ修正や機能追加ではないコード変更"
+          echo "  test:     テストの追加や修正"
+          echo "  chore:    ビルドプロセスやツールの変更"
+          echo "  perf:     パフォーマンス改善"
+          echo "  ci:       CI設定の変更"
+          echo "  build:    ビルドシステムや外部依存関係の変更"
+          echo "  revert:   以前のコミットを取り消す"
+          exit 1
+        fi
