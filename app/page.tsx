@@ -408,12 +408,11 @@ function GolfFitter() {
               <p className="text-sm text-gray-600 mb-2">次のステップを選択してください</p>
             </div>
             <div className="flex justify-center gap-4">
-              <Button
-                onClick={() => setCurrentStep('swing-analysis')}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                スイング分析
-              </Button>
+              <Link href="/swing-analysis">
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  スイング分析
+                </Button>
+              </Link>
               <Link href="/swing-comparison">
                 <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 border-2 border-red-500">
                   <BarChart3 className="w-4 h-4 mr-2" />
