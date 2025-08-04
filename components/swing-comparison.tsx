@@ -110,7 +110,7 @@ export function SwingComparison({
               </Button>
               <Button onClick={onBack} variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                戻る
+                診断結果に戻る
               </Button>
             </div>
           </CardContent>
@@ -190,7 +190,7 @@ export function SwingComparison({
               </Button>
               <Button onClick={onBack} variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                戻る
+                診断結果に戻る
               </Button>
             </div>
           </CardContent>
@@ -316,7 +316,7 @@ export function SwingComparison({
           <div className="mt-6 flex justify-center">
             <Button onClick={onBack} variant="outline">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              戻る
+              診断結果に戻る
             </Button>
           </div>
         </CardContent>
