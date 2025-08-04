@@ -191,7 +191,8 @@ function GolfFitter() {
     sessionStorage.setItem('matchedPro', JSON.stringify(match));
     sessionStorage.setItem('userData', JSON.stringify(userData));
     
-    setCurrentStep('results');
+    // 分析ページに遷移
+    window.location.href = '/swing-analysis';
   };
 
   const handleInputChange = (field: keyof UserData, value: string | number) => {
