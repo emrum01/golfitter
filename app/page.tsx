@@ -21,9 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Upload, User, Target, Activity, BarChart3 } from 'lucide-react';
+import { Upload, User, Target, Activity, BarChart3, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SwingAnalysis from '@/components/swing-analysis';
+import { MobileVideoPlayer } from '@/components/mobile-video-player';
 import Link from 'next/link';
 
 interface UserData {
@@ -66,7 +67,7 @@ const proGolfers: ProGolfer[] = [
     armLength: 85,
     strengthLevel: 4,
     imageUrl: '/placeholder.svg?height=200&width=200',
-    swingVideoUrl: '/placeholder.svg?height=300&width=400',
+    swingVideoUrl: '/videos/test.mp4',
     clubSet: {
       driver: 'TaylorMade SIM2 Driver',
       irons: 'Titleist T100 Irons',
@@ -83,7 +84,7 @@ const proGolfers: ProGolfer[] = [
     armLength: 78,
     strengthLevel: 3,
     imageUrl: '/placeholder.svg?height=200&width=200',
-    swingVideoUrl: '/placeholder.svg?height=300&width=400',
+    swingVideoUrl: '/videos/test2.mp4',
     clubSet: {
       driver: 'Callaway Epic Speed Driver',
       irons: 'Mizuno JPX921 Irons',
@@ -100,7 +101,7 @@ const proGolfers: ProGolfer[] = [
     armLength: 90,
     strengthLevel: 5,
     imageUrl: '/placeholder.svg?height=200&width=200',
-    swingVideoUrl: '/placeholder.svg?height=300&width=400',
+    swingVideoUrl: '/videos/test.mp4',
     clubSet: {
       driver: 'Ping G425 LST Driver',
       irons: 'PXG 0311 T Irons',
@@ -154,6 +155,7 @@ function GolfFitter() {
   const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
 
   // URLパラメータからcurrentStepを読み取る
   useEffect(() => {
@@ -363,12 +365,40 @@ function GolfFitter() {
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <img
-                    src={matchedPro.swingVideoUrl || '/placeholder.svg'}
-                    alt="スイング動画"
-                    className="w-full h-64 object-cover rounded-lg"
+                <div className="relative">
+                  {/* 動画プレーヤー */}
+                  <MobileVideoPlayer
+                    key={currentVideoIndex}
+                    src={currentVideoIndex === 0 ? '/videos/test.mp4' : '/videos/test2.mp4'}
+                    title={`${matchedPro.name}のスイング ${currentVideoIndex + 1}`}
+                    className="w-full h-64 rounded-lg"
                   />
+                  
+                  {/* 動画切り替えボタン（オーバーレイ） */}
+                  <div className="absolute inset-0 flex items-center justify-between pointer-events-none">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setCurrentVideoIndex(currentVideoIndex === 0 ? 1 : 0)}
+                      className="h-10 w-10 rounded-full bg-white/90 backdrop-blur-sm border-gray-300 hover:bg-white hover:border-gray-400 transition-all duration-200 shadow-lg ml-4 pointer-events-auto"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setCurrentVideoIndex(currentVideoIndex === 0 ? 1 : 0)}
+                      className="h-10 w-10 rounded-full bg-white/90 backdrop-blur-sm border-gray-300 hover:bg-white hover:border-gray-400 transition-all duration-200 shadow-lg mr-4 pointer-events-auto"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </Button>
+                  </div>
+                  
+                  {/* 動画番号インジケーター */}
+                  <div className="absolute top-4 right-4 bg-black/60 text-white px-2 py-1 rounded-full text-xs font-medium">
+                    {currentVideoIndex + 1} / 2
+                  </div>
                 </div>
                 <div className="space-y-4">
                   <h4 className="font-semibold">改善ポイント</h4>
