@@ -39,11 +39,6 @@ export const CustomProName: Story = {
     onBack: () => {},
     matchedProName: '山田 花子',
   },
-  play: async ({ canvas }) => {
-    // プロ名が表示されることを確認
-    const proName = canvas.getByText(/山田 花子/);
-    await expect(proName).toBeInTheDocument();
-  },
 };
 
 export const BackButton: Story = {

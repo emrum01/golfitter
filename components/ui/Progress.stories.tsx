@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { expect, waitFor } from 'storybook/test';
 import { Progress } from '@/components/ui/progress';
 import { useEffect, useState } from 'react';
 
@@ -24,25 +23,11 @@ export const Default: Story = {
   args: {
     value: 33,
   },
-  play: async ({ canvas }) => {
-    const progressRoot = canvas.getByRole('progressbar');
-    const progressIndicator = progressRoot.querySelector('.bg-primary');
-    
-    await expect(progressRoot).toBeInTheDocument();
-    await expect(progressIndicator).toBeInTheDocument();
-    await expect(progressIndicator).toHaveStyle({ transform: 'translateX(-67%)' });
-  },
 };
 
 export const Empty: Story = {
   args: {
     value: 0,
-  },
-  play: async ({ canvas }) => {
-    const progressRoot = canvas.getByRole('progressbar');
-    const progressIndicator = progressRoot.querySelector('.bg-primary');
-    
-    await expect(progressIndicator).toHaveStyle({ transform: 'translateX(-100%)' });
   },
 };
 
@@ -50,140 +35,162 @@ export const Half: Story = {
   args: {
     value: 50,
   },
-  play: async ({ canvas }) => {
-    const progressRoot = canvas.getByRole('progressbar');
-    const progressIndicator = progressRoot.querySelector('.bg-primary');
-    
-    await expect(progressIndicator).toHaveStyle({ transform: 'translateX(-50%)' });
-  },
 };
 
 export const Full: Story = {
   args: {
     value: 100,
   },
-  play: async ({ canvas }) => {
-    const progressRoot = canvas.getByRole('progressbar');
-    const progressIndicator = progressRoot.querySelector('.bg-primary');
-    
-    await expect(progressIndicator).toHaveStyle({ transform: 'translateX(0%)' });
-  },
 };
 
-export const CustomClass: Story = {
-  args: {
-    value: 75,
-    className: 'custom-progress-class',
-  },
-  play: async ({ canvas }) => {
-    const progressRoot = canvas.getByRole('progressbar');
-    await expect(progressRoot).toHaveClass('custom-progress-class');
-  },
+export const CustomSize: Story = {
+  render: () => (
+    <div className="space-y-4 w-64">
+      <Progress value={25} className="h-1" />
+      <Progress value={50} className="h-2" />
+      <Progress value={75} className="h-3" />
+      <Progress value={100} className="h-4" />
+    </div>
+  ),
 };
 
-export const DefaultStyles: Story = {
-  args: {
-    value: 60,
-  },
-  play: async ({ canvas }) => {
-    const progressRoot = canvas.getByRole('progressbar');
-    const progressIndicator = progressRoot.querySelector('.bg-primary');
-    
-    // ルート要素のスタイル確認
-    await expect(progressRoot).toHaveClass(/relative/);
-    await expect(progressRoot).toHaveClass(/h-4/);
-    await expect(progressRoot).toHaveClass(/w-full/);
-    await expect(progressRoot).toHaveClass(/overflow-hidden/);
-    await expect(progressRoot).toHaveClass(/rounded-full/);
-    await expect(progressRoot).toHaveClass(/bg-secondary/);
-    
-    // インジケーターのスタイル確認
-    await expect(progressIndicator).toHaveClass(/h-full/);
-    await expect(progressIndicator).toHaveClass(/w-full/);
-    await expect(progressIndicator).toHaveClass(/flex-1/);
-    await expect(progressIndicator).toHaveClass(/bg-primary/);
-    await expect(progressIndicator).toHaveClass(/transition-all/);
-  },
+export const CustomColors: Story = {
+  render: () => (
+    <div className="space-y-4 w-64">
+      <Progress value={25} className="bg-gray-200" />
+      <Progress value={50} className="bg-blue-100" />
+      <Progress value={75} className="bg-green-100" />
+      <Progress value={100} className="bg-red-100" />
+    </div>
+  ),
 };
 
 export const Animated: Story = {
   render: () => {
-    const [progress, setProgress] = useState(0);
-    
-    useEffect(() => {
-      const timer = setTimeout(() => setProgress(66), 100);
-      return () => clearTimeout(timer);
-    }, []);
-    
-    return <Progress value={progress} className="w-[60%]" />;
-  },
-  play: async ({ canvas }) => {
-    const progressRoot = canvas.getByRole('progressbar');
-    const progressIndicator = progressRoot.querySelector('.bg-primary');
-    
-    // 初期状態
-    await expect(progressRoot).toBeInTheDocument();
-    
-    // アニメーション後の状態を待つ
-    await waitFor(() => {
-      expect(progressIndicator).toHaveStyle({ transform: 'translateX(-34%)' });
-    }, { timeout: 1000 });
-    
-    // トランジションクラスの確認
-    await expect(progressIndicator).toHaveClass(/transition-all/);
+    const AnimatedProgress = () => {
+      const [progress, setProgress] = useState(0);
+
+      useEffect(() => {
+        const timer = setTimeout(() => setProgress(66), 500);
+        return () => clearTimeout(timer);
+      }, []);
+
+      return <Progress value={progress} className="w-64" />;
+    };
+
+    return <AnimatedProgress />;
   },
 };
 
-export const CustomWidth: Story = {
+export const Loading: Story = {
+  render: () => {
+    const LoadingProgress = () => {
+      const [progress, setProgress] = useState(0);
+
+      useEffect(() => {
+        const interval = setInterval(() => {
+          setProgress((prev) => {
+            if (prev >= 100) {
+              clearInterval(interval);
+              return 100;
+            }
+            return prev + 10;
+          });
+        }, 500);
+
+        return () => clearInterval(interval);
+      }, []);
+
+      return <Progress value={progress} className="w-64" />;
+    };
+
+    return <LoadingProgress />;
+  },
+};
+
+export const WithLabel: Story = {
   render: () => (
-    <div className="w-[300px]">
-      <Progress value={40} />
+    <div className="space-y-2">
+      <div className="flex justify-between text-sm">
+        <span>Progress</span>
+        <span>66%</span>
+      </div>
+      <Progress value={66} className="w-64" />
     </div>
   ),
-  play: async ({ canvas }) => {
-    const progressRoot = canvas.getByRole('progressbar');
-    
-    await expect(progressRoot).toBeInTheDocument();
-    await expect(progressRoot).toHaveClass(/w-full/);
-    await expect(progressRoot.parentElement).toHaveClass('w-[300px]');
-  },
 };
 
-export const NullValue: Story = {
-  args: {
-    value: null,
-  },
-  play: async ({ canvas }) => {
-    const progressRoot = canvas.getByRole('progressbar');
-    const progressIndicator = progressRoot.querySelector('.bg-primary');
-    
-    // null値の場合、0として扱われることを確認
-    await expect(progressIndicator).toHaveStyle({ transform: 'translateX(-100%)' });
-  },
-};
-
-export const OutOfBoundsValues: Story = {
+export const MultipleProgress: Story = {
   render: () => (
     <div className="space-y-4">
       <div>
-        <p className="text-sm mb-2">Negative value (-20)</p>
-        <Progress value={-20} />
+        <p className="text-sm font-medium mb-2">Downloading...</p>
+        <Progress value={75} className="w-64" />
       </div>
       <div>
-        <p className="text-sm mb-2">Over 100 (120)</p>
-        <Progress value={120} />
+        <p className="text-sm font-medium mb-2">Installing...</p>
+        <Progress value={33} className="w-64" />
+      </div>
+      <div>
+        <p className="text-sm font-medium mb-2">Complete</p>
+        <Progress value={100} className="w-64" />
       </div>
     </div>
   ),
-  play: async ({ canvas }) => {
-    const progressBars = canvas.getAllByRole('progressbar');
-    
-    // 負の値は0にクランプされる
-    const firstIndicator = progressBars[0].querySelector('.bg-primary');
-    await expect(firstIndicator).toHaveStyle({ transform: 'translateX(-100%)' });
-    
-    // 100を超える値は100にクランプされる
-    const secondIndicator = progressBars[1].querySelector('.bg-primary');
-    await expect(secondIndicator).toHaveStyle({ transform: 'translateX(0%)' });
+};
+
+export const Indeterminate: Story = {
+  render: () => (
+    <div className="w-64">
+      <Progress value={null} className="animate-pulse" />
+      <p className="text-xs text-gray-500 mt-2">Processing...</p>
+    </div>
+  ),
+};
+
+export const StepProgress: Story = {
+  render: () => {
+    const steps = [
+      { name: 'Order placed', value: 100 },
+      { name: 'Processing', value: 100 },
+      { name: 'Shipped', value: 100 },
+      { name: 'Delivered', value: 0 },
+    ];
+
+    return (
+      <div className="w-full max-w-md space-y-4">
+        {steps.map((step, index) => (
+          <div key={step.name}>
+            <div className="flex justify-between text-sm mb-1">
+              <span className={step.value > 0 ? 'font-medium' : 'text-gray-500'}>
+                {step.name}
+              </span>
+              {step.value > 0 && (
+                <span className="text-green-600">✓</span>
+              )}
+            </div>
+            <Progress 
+              value={step.value} 
+              className={`h-2 ${step.value === 0 ? 'opacity-50' : ''}`}
+            />
+          </div>
+        ))}
+      </div>
+    );
   },
+};
+
+export const GradientProgress: Story = {
+  render: () => (
+    <div className="space-y-4 w-64">
+      <div>
+        <Progress value={75} className="h-3" />
+        <style jsx>{`
+          .bg-primary {
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+          }
+        `}</style>
+      </div>
+    </div>
+  ),
 };

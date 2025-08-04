@@ -50,9 +50,12 @@ export const VideoUpload: Story = {
     await expect(uploadArea1).toBeInTheDocument();
     await expect(uploadArea2).toBeInTheDocument();
     
-    // ファイル形式の説明
-    await expect(canvas.getByText(/MP4, MOV, AVI形式対応/)).toBeInTheDocument();
-    await expect(canvas.getByText(/最大100MB/)).toBeInTheDocument();
+    // ファイル形式の説明（複数存在するので getAllByText を使用）
+    const formatTexts = canvas.getAllByText(/MP4, MOV, AVI形式対応/);
+    await expect(formatTexts).toHaveLength(2); // 2つの動画アップロードエリアがある
+    
+    const sizeTexts = canvas.getAllByText(/最大100MB/);
+    await expect(sizeTexts).toHaveLength(2);
   },
 };
 
@@ -81,8 +84,8 @@ export const BackButton: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     
-    // 戻るボタンの確認
-    const backButton = canvas.getByRole('button', { name: '戻る' });
+    // 戻るボタンの確認（実際のテキストは「診断結果に戻る」）
+    const backButton = canvas.getByRole('button', { name: '診断結果に戻る' });
     await expect(backButton).toBeInTheDocument();
     await expect(backButton).toBeEnabled();
     
@@ -105,9 +108,10 @@ export const LoadingState: Story = {
     await expect(canvas.getByText('分析中...')).toBeInTheDocument();
     await expect(canvas.getByRole('progressbar')).toBeInTheDocument();
     
-    // 分析ボタンが無効化される
-    const analyzeButton = canvas.getByRole('button', { name: '比較分析開始' });
-    await expect(analyzeButton).toBeDisabled();
+    // ローディング中は「診断結果に戻る」ボタンのみ表示される
+    const backButton = canvas.getByRole('button', { name: '診断結果に戻る' });
+    await expect(backButton).toBeInTheDocument();
+    await expect(backButton).toBeEnabled();
   },
 };
 
@@ -145,14 +149,20 @@ export const ErrorState: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     
-    // エラー状態の確認
+    // エラータイトルの確認
     await expect(canvas.getByText('エラー')).toBeInTheDocument();
+    
+    // エラーメッセージの確認
     await expect(canvas.getByText('動画の分析に失敗しました。再度お試しください。')).toBeInTheDocument();
     
     // 再試行ボタンの確認
     const retryButton = canvas.getByRole('button', { name: '再試行' });
     await expect(retryButton).toBeInTheDocument();
     await expect(retryButton).toBeEnabled();
+    
+    // 診断結果に戻るボタンも存在する
+    const backButton = canvas.getByRole('button', { name: '診断結果に戻る' });
+    await expect(backButton).toBeInTheDocument();
   },
 };
 

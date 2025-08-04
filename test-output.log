@@ -1,0 +1,30 @@
+
+> golfitter@0.1.0 test
+> vitest
+
+info Using tsconfig paths for react-docgen
+
+ RUN  v3.2.4 /Users/h_iwakubo/Github/Hobby/golfitter
+
+info Using tsconfig paths for react-docgen
+   Loading config from /Users/h_iwakubo/Github/Hobby/golfitter/next.config.ts
+ ✓ |chromium| components/ui/Badge.stories.tsx (10 tests) 713ms
+ ✓ |chromium| components/mobile-video-player.stories.tsx (10 tests) 850ms
+ ✓ |chromium| components/ui/Card.stories.tsx (14 tests) 895ms
+ ✓ |chromium| components/ui/Progress.stories.tsx (13 tests) 897ms
+ ✓ |chromium| components/ui/Avatar.stories.tsx (14 tests) 913ms
+ ✓ |chromium| components/ui/Input.stories.tsx (11 tests) 920ms
+ ✓ |chromium| components/ui/Button.stories.tsx (15 tests) 929ms
+ ✓ |chromium| components/VideoUpload.stories.tsx (10 tests) 927ms
+   ✓ Default  310ms
+ ✓ |chromium| components/swing-comparison.stories.tsx (21 tests) 1429ms
+   ✓ Default  331ms
+ ✓ |chromium| components/ui/Label.stories.tsx (8 tests) 209ms
+ ✓ |chromium| components/ui/Select.stories.tsx (10 tests) 315ms
+ ✓ |chromium| components/SwingAnalysis.stories.tsx (7 tests) 278ms
+
+ Test Files  12 passed (12)
+      Tests  143 passed (143)
+   Start at  07:54:31
+   Duration  4.35s (transform 0ms, setup 8.54s, collect 3.25s, tests 9.28s, environment 0ms, prepare 59.34s)
+
