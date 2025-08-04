@@ -12,6 +12,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:watch": "vitest --watch",
+    "typecheck": "tsc --noEmit",
     "sync:claude-cursor": "node scripts/sync-claude-cursor.js"
   },
   "dependencies": {
@@ -24,6 +25,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.536.0",
+    "markdown-to-jsx": "^7.7.12",
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -33,6 +35,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.0",
     "@eslint/eslintrc": "^3",
+    "@evilmartians/lefthook": "^1.12.2",
     "@storybook/addon-a11y": "^9.1.1",
     "@storybook/addon-docs": "^9.1.1",
     "@storybook/addon-onboarding": "^9.1.1",
