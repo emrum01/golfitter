@@ -80,10 +80,18 @@ find . -name "*.tsx" -type f | xargs grep "pattern"
 
 ## ⚠️ 注意事項
 
-- コミットは明示的に指示されるまで行わない
 - 実装前に必ず影響範囲を調査する
 - TDDサイクルに従って実装を進める
 - 型定義は適切に行い、`any`型は避ける
+
+## 🔐 権限設定
+
+以下のコマンドは承認なしで実行可能:
+- `git add`
+- `git commit`
+- `git status`
+- `git diff`
+- `git log`
 
 ## 📊 プロジェクト状態
 
