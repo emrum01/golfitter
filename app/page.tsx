@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { ProtectedRoute } from '@/components/protected-route';
+import { useAuth } from '@/lib/auth-context';
 import {
   Card,
   CardContent,
@@ -130,12 +132,13 @@ function findBestMatch(userData: UserData): ProGolfer {
   return bestMatch;
 }
 
-export default function GolfFitter() {
+function GolfFitter() {
+  const { user, signOut } = useAuth();
   const [currentStep, setCurrentStep] = useState<
     'input' | 'results' | 'swing-analysis'
   >('input');
   const [userData, setUserData] = useState<UserData>({
-    name: '',
+    name: user?.user_metadata?.full_name || user?.email || '',
     height: 0,
     weight: 0,
     armLength: 0,
@@ -163,6 +166,14 @@ export default function GolfFitter() {
     }));
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('サインアウトエラー:', error);
+    }
+  };
+
   if (currentStep === 'swing-analysis') {
     return (
       <SwingAnalysis
@@ -174,14 +185,40 @@ export default function GolfFitter() {
 
   if (currentStep === 'results' && matchedPro) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold text-green-800">診断結果</h1>
-            <p className="text-gray-600">
-              あなたに最適なプロゴルファーとクラブセットをご提案します
-            </p>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+        {/* ヘッダー */}
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center">
+                <h1 className="text-xl font-bold text-gray-900">Golfitter</h1>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.user_metadata?.avatar_url} />
+                    <AvatarFallback>
+                      {user?.email?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm text-gray-700">{user?.email}</span>
+                </div>
+                <Button onClick={handleSignOut} variant="outline" size="sm">
+                  ログアウト
+                </Button>
+              </div>
+            </div>
           </div>
+        </header>
+
+        <div className="p-4">
+          <div className="max-w-6xl mx-auto space-y-6">
+            <div className="text-center space-y-2">
+              <h1 className="text-3xl font-bold text-green-800">診断結果</h1>
+              <p className="text-gray-600">
+                あなたに最適なプロゴルファーとクラブセットをご提案します
+              </p>
+            </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* プロゴルファーマッチング */}
@@ -348,6 +385,7 @@ export default function GolfFitter() {
                 動画を見る
               </Button>
             </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -355,16 +393,42 @@ export default function GolfFitter() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-green-800">
-            ゴルフフィッター
-          </h1>
-          <p className="text-gray-600">
-            あなたに最適なゴルフクラブとスイングを提案します
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+      {/* ヘッダー */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <h1 className="text-xl font-bold text-gray-900">Golfitter</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user?.user_metadata?.avatar_url} />
+                  <AvatarFallback>
+                    {user?.email?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm text-gray-700">{user?.email}</span>
+              </div>
+              <Button onClick={handleSignOut} variant="outline" size="sm">
+                ログアウト
+              </Button>
+            </div>
+          </div>
         </div>
+      </header>
+
+      <div className="p-4">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold text-green-800">
+              ゴルフフィッター
+            </h1>
+            <p className="text-gray-600">
+              あなたに最適なゴルフクラブとスイングを提案します
+            </p>
+          </div>
 
         <div className="grid md:grid-cols-2 gap-6">
           {/* 身体データ入力 */}
@@ -552,8 +616,17 @@ export default function GolfFitter() {
           >
             AI診断を開始
           </Button>
+          </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <ProtectedRoute>
+      <GolfFitter />
+    </ProtectedRoute>
   );
 }
