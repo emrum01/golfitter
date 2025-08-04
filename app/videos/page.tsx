@@ -31,15 +31,13 @@ export default function VideosPage() {
         const videoList: Video[] = [];
 
         for (const video of allVideos) {
-          const url = await videoStorage.getVideoUrl(video.id);
-          if (url) {
-            videoList.push({
-              id: video.id,
-              name: video.name,
-              url,
-              uploadedAt: video.uploadedAt,
-            });
-          }
+          const url = videoStorage.getVideoUrl(video);
+          videoList.push({
+            id: video.id,
+            name: video.name,
+            url,
+            uploadedAt: video.uploadedAt,
+          });
         }
 
         setVideos(videoList);
