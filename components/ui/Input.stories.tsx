@@ -100,10 +100,9 @@ export const FileInput: Story = {
   args: {
     type: 'file',
   },
-  play: async ({ canvas }) => {
+  play: async ({ canvasElement }) => {
     // Query the file input by its data-slot attribute
-    const container = canvas.container as HTMLElement;
-    const fileInput = container.querySelector('input[type="file"][data-slot="input"]');
+    const fileInput = canvasElement.querySelector('input[type="file"][data-slot="input"]');
     
     await expect(fileInput).toBeInTheDocument();
     await expect(fileInput).toHaveAttribute('type', 'file');

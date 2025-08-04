@@ -113,7 +113,7 @@ export default function SwingAnalysis({
     if (!uploadedVideo) return;
     
     try {
-      const videoId = await videoStorage.saveVideo(uploadedVideo);
+      await videoStorage.saveVideo(uploadedVideo);
       await loadSavedVideos();
       alert('動画が保存されました');
     } catch (error) {

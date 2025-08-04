@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Upload, User, Target, Activity, BarChart3 } from 'lucide-react';
+import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SwingAnalysis from '@/components/swing-analysis';
 import Link from 'next/link';
@@ -151,9 +152,6 @@ function GolfFitter() {
     budget: 0,
   });
   const [matchedPro, setMatchedPro] = useState<ProGolfer | null>(null);
-  const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
-  const [videoUrl, setVideoUrl] = useState<string>('');
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
 
   // URLパラメータからcurrentStepを読み取る
   useEffect(() => {
@@ -181,7 +179,7 @@ function GolfFitter() {
       setUserData(JSON.parse(savedUserData));
       setCurrentStep('results');
     }
-  }, []);
+  }, [currentStep]);
 
   const handleSubmit = () => {
     const match = findBestMatch(userData);
@@ -364,9 +362,11 @@ function GolfFitter() {
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <img
+                  <Image
                     src={matchedPro.swingVideoUrl || '/placeholder.svg'}
                     alt="スイング動画"
+                    width={400}
+                    height={256}
                     className="w-full h-64 object-cover rounded-lg"
                   />
                 </div>

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, userEvent, waitFor } from 'storybook/test';
 import { VideoUpload } from '@/components/video-upload';
 
 const meta = {
@@ -46,7 +46,7 @@ export const FileSelection: Story = {
   args: {
     onUploadComplete: (videoId: string) => console.log('Video uploaded:', videoId),
   },
-  play: async ({ canvas, mount }) => {
+  play: async ({ canvas }) => {
     // ファイル入力要素を探す
     const fileInput = canvas.getByLabelText('クリックして動画を選択').parentElement?.querySelector('input[type="file"]') as HTMLInputElement;
     await expect(fileInput).toBeInTheDocument();
@@ -167,7 +167,7 @@ export const SaveVideo: Story = {
   args: {
     onUploadComplete: (videoId: string) => console.log('Video uploaded:', videoId),
   },
-  play: async ({ canvas, args }) => {
+  play: async ({ canvas }) => {
     const fileInput = canvas.getByLabelText('クリックして動画を選択').parentElement?.querySelector('input[type="file"]') as HTMLInputElement;
     
     // ファイルを選択

@@ -9,12 +9,12 @@ const mockIndexedDB = {
 
 // IDBRequestのモック
 class MockIDBRequest {
-  result: any;
-  error: any;
+  result: unknown;
+  error: unknown;
   onsuccess: (() => void) | null = null;
   onerror: (() => void) | null = null;
 
-  constructor(result?: any, error?: any) {
+  constructor(result?: unknown, error?: unknown) {
     this.result = result;
     this.error = error;
     // 非同期でコールバックを実行
@@ -31,14 +31,14 @@ class MockIDBRequest {
 // IDBObjectStoreのモック
 class MockIDBObjectStore {
   name: string;
-  data: Map<string, any>;
+  data: Map<string, unknown>;
 
   constructor(name: string) {
     this.name = name;
     this.data = new Map();
   }
 
-  add(value: any) {
+  add(value: { id: string; [key: string]: unknown }) {
     const key = value.id;
     if (this.data.has(key)) {
       return new MockIDBRequest(undefined, new Error('Key already exists'));
@@ -113,21 +113,23 @@ class MockIDBDatabase {
     } as DOMStringList;
   }
 
-  createObjectStore(name: string, options?: any) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  createObjectStore(name: string, _options?: IDBObjectStoreParameters) {
     const store = new MockIDBObjectStore(name);
     this.objectStores.set(name, store);
-    (this.objectStoreNames as any).length = this.objectStores.size;
+    (this.objectStoreNames as unknown as { length: number }).length = this.objectStores.size;
     return store;
   }
 
-  transaction(storeNames: string[], mode?: string) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  transaction(storeNames: string[], _mode?: IDBTransactionMode) {
     return new MockIDBTransaction(this, Array.isArray(storeNames) ? storeNames : [storeNames]);
   }
 }
 
 // IDBOpenDBRequestのモック
 class MockIDBOpenDBRequest extends MockIDBRequest {
-  onupgradeneeded: ((event: any) => void) | null = null;
+  onupgradeneeded: ((event: IDBVersionChangeEvent) => void) | null = null;
 
   constructor(name: string, version: number) {
     const db = new MockIDBDatabase(name, version);
@@ -136,7 +138,7 @@ class MockIDBOpenDBRequest extends MockIDBRequest {
     // 新規作成の場合、upgradeが必要
     setTimeout(() => {
       if (this.onupgradeneeded) {
-        this.onupgradeneeded({ target: this });
+        this.onupgradeneeded({ target: this } as unknown as IDBVersionChangeEvent);
       }
       if (this.onsuccess) {
         this.onsuccess();
@@ -151,10 +153,11 @@ describe('VideoStorage', () => {
     mockIndexedDB.open.mockImplementation((name: string, version: number) => {
       return new MockIDBOpenDBRequest(name, version);
     });
-    (global as any).indexedDB = mockIndexedDB;
+    (global as unknown as { indexedDB: typeof mockIndexedDB }).indexedDB = mockIndexedDB;
 
     // URL.createObjectURLとURL.revokeObjectURLのモック
-    global.URL.createObjectURL = vi.fn((blob: Blob) => `blob:mock-url-${Date.now()}`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    global.URL.createObjectURL = vi.fn((_blob: Blob) => `blob:mock-url-${Date.now()}`);
     global.URL.revokeObjectURL = vi.fn();
   });
 
@@ -313,7 +316,7 @@ describe('VideoStorage', () => {
         }))
       };
       
-      (videoStorage as any).db = mockDb;
+      (videoStorage as unknown as { db: typeof mockDb }).db = mockDb;
 
       await expect(videoStorage.saveVideo(mockFile)).rejects.toThrow();
     });
