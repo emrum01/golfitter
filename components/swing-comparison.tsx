@@ -1,7 +1,6 @@
 'use client';
 
-import type React from 'react';
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Card,
   CardContent,
@@ -31,14 +30,25 @@ export function SwingComparison({
   isLoading = false,
   analysisResult = null,
   error = null,
+  presetVideo2,
+  presetVideo2Name,
 }: SwingComparisonProps) {
   const [video1, setVideo1] = useState<File | null>(null);
   const [video2, setVideo2] = useState<File | null>(null);
   const [video1Url, setVideo1Url] = useState<string>('');
   const [video2Url, setVideo2Url] = useState<string>('');
   const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [presetVideo2DisplayName, setPresetVideo2DisplayName] = useState<string>('');
   const fileInput1Ref = useRef<HTMLInputElement>(null);
   const fileInput2Ref = useRef<HTMLInputElement>(null);
+
+  // presetVideo2が設定されている場合、動画2を自動設定
+  React.useEffect(() => {
+    if (presetVideo2) {
+      setVideo2Url(presetVideo2);
+      setPresetVideo2DisplayName(presetVideo2Name || 'プロのスイング');
+    }
+  }, [presetVideo2, presetVideo2Name]);
 
   const handleVideo1Upload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -59,7 +69,7 @@ export function SwingComparison({
   };
 
   const handleAnalyze = async () => {
-    if (!video1 || !video2) return;
+    if (!video1 || (!video2 && !presetVideo2)) return;
 
     // モック分析処理
     setAnalysisProgress(0);
@@ -87,7 +97,7 @@ export function SwingComparison({
     setAnalysisProgress(0);
   };
 
-  const canAnalyze = video1 && video2 && !isLoading;
+  const canAnalyze = video1 && (video2 || presetVideo2) && !isLoading;
 
 
 
@@ -260,9 +270,13 @@ export function SwingComparison({
 
                 {/* 動画2 */}
                 <div>
-                  <h3 className="font-semibold mb-3">動画2</h3>
+                  <h3 className="font-semibold mb-3">動画2 {presetVideo2 && <span className="text-sm text-blue-600">(プロのスイング)</span>}</h3>
                   <div
-                    className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                    className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                      presetVideo2 
+                        ? 'border-blue-300 bg-blue-50 hover:border-blue-400' 
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
                     onClick={() => fileInput2Ref.current?.click()}
                   >
                     {video2Url ? (
@@ -272,7 +286,14 @@ export function SwingComparison({
                           className="w-full h-32 object-cover rounded mb-2"
                           controls
                         />
-                        <p className="text-sm text-gray-600">{video2?.name}</p>
+                        <p className="text-sm text-gray-600">
+                          {presetVideo2 ? presetVideo2DisplayName : video2?.name}
+                        </p>
+                        {presetVideo2 && (
+                          <p className="text-xs text-blue-600 mt-1">
+                            ✓ プロのスイングが自動設定されました
+                          </p>
+                        )}
                       </div>
                     ) : (
                       <div>

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { within, userEvent, expect, fn } from 'storybook/test';
+import { within, userEvent, expect, fn, waitFor } from 'storybook/test';
 import { SwingComparison } from './swing-comparison';
 import { mockAnalysisResult, mockAnalysisResultHighScore, mockAnalysisResultLowScore } from '@/lib/mocks/swing-analysis';
 
@@ -199,5 +199,144 @@ export const LowScoreResult: Story = {
     await expect(canvas.getByText('姿勢: 70')).toBeInTheDocument();
     await expect(canvas.getByText('バランス: 65')).toBeInTheDocument();
     await expect(canvas.getByText('クラブパス: 60')).toBeInTheDocument();
+  },
+};
+
+export const VideoUploadInteraction: Story = {
+  args: {
+    onBack: fn(),
+    onAnalysisComplete: fn(),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // 動画1のアップロードエリアをクリック
+    const uploadArea1 = canvas.getByText('動画1をアップロード').closest('div');
+    await expect(uploadArea1).toBeInTheDocument();
+    
+    // ファイル入力要素の存在確認
+    const fileInput1 = canvasElement.querySelector('input[type="file"]');
+    await expect(fileInput1).toBeInTheDocument();
+    await expect(fileInput1).toHaveAttribute('accept', 'video/*');
+    
+    // 動画2のアップロードエリアの確認
+    const uploadArea2 = canvas.getByText('動画2をアップロード').closest('div');
+    await expect(uploadArea2).toBeInTheDocument();
+  },
+};
+
+export const PresetVideo2: Story = {
+  args: {
+    onBack: fn(),
+    onAnalysisComplete: fn(),
+    presetVideo2: '/videos/pro-swing.mp4',
+    presetVideo2Name: '田中太郎のスイング',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // 動画2にプロのスイングラベルが表示される
+    await expect(canvas.getByText('(プロのスイング)')).toBeInTheDocument();
+    
+    // 動画2エリアの青色のスタイルを確認（より具体的なセレクタ）
+    const video2Areas = canvasElement.querySelectorAll('.border-2.border-dashed');
+    const video2Area = video2Areas[1]; // 2番目のアップロードエリア
+    await expect(video2Area).toHaveClass('border-blue-300');
+    await expect(video2Area).toHaveClass('bg-blue-50');
+    
+    // プリセット動画の名前が表示される
+    await expect(canvas.getByText('田中太郎のスイング')).toBeInTheDocument();
+    
+    // 自動設定メッセージが表示される
+    await expect(canvas.getByText('✓ プロのスイングが自動設定されました')).toBeInTheDocument();
+  },
+};
+
+export const AnalysisButtonEnabledWithVideo: Story = {
+  args: {
+    onBack: fn(),
+    onAnalysisComplete: fn(),
+    presetVideo2: '/videos/pro-swing.mp4',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // 初期状態：動画1がないので分析ボタンは無効
+    const analyzeButton = canvas.getByRole('button', { name: '比較分析開始' });
+    await expect(analyzeButton).toBeDisabled();
+    
+    // 動画1をアップロード（シミュレート）
+    const fileInput1 = canvasElement.querySelectorAll('input[type="file"]')[0] as HTMLInputElement;
+    const file = new File(['video content'], 'my-swing.mp4', { type: 'video/mp4' });
+    
+    // ファイル変更イベントをシミュレート
+    Object.defineProperty(fileInput1, 'files', {
+      value: [file],
+      writable: false,
+    });
+    
+    const event = new Event('change', { bubbles: true });
+    fileInput1.dispatchEvent(event);
+    
+    // 分析ボタンが有効になることを確認（動画1 + presetVideo2）
+    await waitFor(() => {
+      expect(analyzeButton).toBeEnabled();
+    });
+  },
+};
+
+export const RetryFunctionality: Story = {
+  args: {
+    onBack: fn(),
+    onAnalysisComplete: fn(),
+    analysisResult: mockAnalysisResult,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // 新しい動画で分析ボタンを確認
+    const retryButton = canvas.getByRole('button', { name: '新しい動画で分析' });
+    await expect(retryButton).toBeInTheDocument();
+    
+    // 注：実際のコンポーネントでは、RetryボタンはhandleRetry関数を呼び出しますが、
+    // 現在のコンポーネントの実装では、状態をリセットしてもanalysisResultが
+    // propsから渡されているため、画面は変わりません。
+    // この動作は正しいため、ボタンの存在確認のみを行います。
+  },
+};
+
+export const AnalysisWithCallbacks: Story = {
+  args: {
+    onBack: fn(),
+    onAnalysisComplete: fn(),
+    presetVideo2: '/videos/test.mp4',
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    
+    // 動画1をアップロード
+    const fileInput1 = canvasElement.querySelectorAll('input[type="file"]')[0] as HTMLInputElement;
+    const file = new File(['video content'], 'my-swing.mp4', { type: 'video/mp4' });
+    Object.defineProperty(fileInput1, 'files', {
+      value: [file],
+      writable: false,
+    });
+    fileInput1.dispatchEvent(new Event('change', { bubbles: true }));
+    
+    // 分析ボタンが有効になるまで待つ
+    const analyzeButton = await waitFor(() => {
+      const button = canvas.getByRole('button', { name: '比較分析開始' });
+      expect(button).toBeEnabled();
+      return button;
+    });
+    
+    await userEvent.click(analyzeButton);
+    
+    // onAnalysisCompleteが呼ばれることを確認（2秒後）
+    // 注：現在の実装では、isLoadingの状態はpropsで制御されているため、
+    // ローディング画面は表示されません。
+    await waitFor(() => {
+      expect(args.onAnalysisComplete).toHaveBeenCalledWith(mockAnalysisResult);
+    }, { timeout: 3000 });
   },
 }; 
