@@ -1,21 +1,27 @@
-'use client'
+'use client';
 
-import { ProtectedRoute } from '@/components/protected-route'
-import { useAuth } from '@/lib/auth-context'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ProtectedRoute } from '@/components/protected-route';
+import { useAuth } from '@/lib/auth-context';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 function Dashboard() {
-  const { user, signOut } = useAuth()
+  const { user, signOut } = useAuth();
 
   const handleSignOut = async () => {
     try {
-      await signOut()
+      await signOut();
     } catch (error) {
-      console.error('サインアウトエラー:', error)
+      console.error('サインアウトエラー:', error);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -66,9 +72,7 @@ function Dashboard() {
           <Card>
             <CardHeader>
               <CardTitle>記録管理</CardTitle>
-              <CardDescription>
-                スコアや練習記録を管理
-              </CardDescription>
+              <CardDescription>スコアや練習記録を管理</CardDescription>
             </CardHeader>
             <CardContent>
               <Button className="w-full" variant="outline">
@@ -81,9 +85,7 @@ function Dashboard() {
           <Card>
             <CardHeader>
               <CardTitle>プロフィール</CardTitle>
-              <CardDescription>
-                ユーザー情報とゴルフ設定の管理
-              </CardDescription>
+              <CardDescription>ユーザー情報とゴルフ設定の管理</CardDescription>
             </CardHeader>
             <CardContent>
               <Button className="w-full" variant="outline">
@@ -97,7 +99,9 @@ function Dashboard() {
         <div className="mt-8">
           <Card>
             <CardHeader>
-              <CardTitle>ようこそ、{user?.user_metadata?.full_name || user?.email}さん！</CardTitle>
+              <CardTitle>
+                ようこそ、{user?.user_metadata?.full_name || user?.email}さん！
+              </CardTitle>
               <CardDescription>
                 Golfitterでゴルフのスキル向上をサポートします
               </CardDescription>
@@ -112,7 +116,7 @@ function Dashboard() {
         </div>
       </main>
     </div>
-  )
+  );
 }
 
 export default function Home() {
@@ -120,5 +124,5 @@ export default function Home() {
     <ProtectedRoute>
       <Dashboard />
     </ProtectedRoute>
-  )
+  );
 }
