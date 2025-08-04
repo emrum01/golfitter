@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { within, userEvent, expect, fn } from '@storybook/test';
+import { within, userEvent, expect, fn } from 'storybook/test';
 import { SwingComparison } from './swing-comparison';
 import { mockAnalysisResult, mockAnalysisResultHighScore, mockAnalysisResultLowScore } from '@/lib/mocks/swing-analysis';
 
