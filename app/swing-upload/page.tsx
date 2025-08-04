@@ -69,11 +69,11 @@ function SwingUploadPage() {
         <div className="mb-6">
           <Button
             variant="ghost"
-            onClick={() => router.back()}
+            onClick={() => router.push('/?currentStep=results')}
             className="mb-4"
           >
             <ChevronLeft className="w-4 h-4 mr-2" />
-            戻る
+            診断結果に戻る
           </Button>
           <h1 className="text-3xl font-bold text-gray-900">
             スイング動画のアップロード

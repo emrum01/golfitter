@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -134,6 +135,7 @@ function findBestMatch(userData: UserData): ProGolfer {
 
 function GolfFitter() {
   const { user, signOut } = useAuth();
+  const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState<
     'input' | 'results' | 'swing-analysis'
   >('input');
@@ -153,9 +155,42 @@ function GolfFitter() {
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [analysisResult, setAnalysisResult] = useState<any>(null);
 
+  // URLパラメータからcurrentStepを読み取る
+  useEffect(() => {
+    const step = searchParams.get('currentStep');
+    if (step === 'results') {
+      // セッションストレージから診断結果を復元
+      const savedMatchedPro = sessionStorage.getItem('matchedPro');
+      const savedUserData = sessionStorage.getItem('userData');
+      
+      if (savedMatchedPro && savedUserData) {
+        setMatchedPro(JSON.parse(savedMatchedPro));
+        setUserData(JSON.parse(savedUserData));
+        setCurrentStep('results');
+      }
+    }
+  }, [searchParams]);
+
+  // アプリケーション初期化時にセッションストレージから診断結果を復元
+  useEffect(() => {
+    const savedMatchedPro = sessionStorage.getItem('matchedPro');
+    const savedUserData = sessionStorage.getItem('userData');
+    
+    if (savedMatchedPro && savedUserData && currentStep === 'input') {
+      setMatchedPro(JSON.parse(savedMatchedPro));
+      setUserData(JSON.parse(savedUserData));
+      setCurrentStep('results');
+    }
+  }, []);
+
   const handleSubmit = () => {
     const match = findBestMatch(userData);
     setMatchedPro(match);
+    
+    // 診断結果をセッションストレージに保存
+    sessionStorage.setItem('matchedPro', JSON.stringify(match));
+    sessionStorage.setItem('userData', JSON.stringify(userData));
+    
     setCurrentStep('results');
   };
 
@@ -389,7 +424,15 @@ function GolfFitter() {
             
             {/* サブアクションボタン */}
             <div className="flex justify-center gap-4 flex-wrap">
-              <Button onClick={() => setCurrentStep('input')} variant="outline">
+              <Button 
+                onClick={() => {
+                  // セッションストレージをクリア
+                  sessionStorage.removeItem('matchedPro');
+                  sessionStorage.removeItem('userData');
+                  setCurrentStep('input');
+                }} 
+                variant="outline"
+              >
                 再診断する
               </Button>
               <Button className="bg-green-600 hover:bg-green-700">

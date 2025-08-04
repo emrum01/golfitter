@@ -82,7 +82,7 @@ export default function VideosPage() {
   return (
     <div className="h-screen bg-black relative">
       <div className="absolute top-4 left-4 z-20">
-        <Link href="/">
+        <Link href="/?currentStep=results">
           <Button
             variant="ghost"
             size="icon"
