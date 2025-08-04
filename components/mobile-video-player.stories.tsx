@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { within, userEvent, expect, waitFor } from '@storybook/test';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { within, userEvent, expect, waitFor, fireEvent } from 'storybook/test';
 import { MobileVideoPlayer } from './mobile-video-player';
 
 const meta = {
@@ -14,6 +14,10 @@ const meta = {
       control: 'text',
       description: '動画ファイルのURL',
     },
+    modelSrc: {
+      control: 'text',
+      description: 'お手本動画のURL',
+    },
     title: {
       control: 'text',
       description: '動画のタイトル（オプション）',
@@ -21,6 +25,10 @@ const meta = {
     className: {
       control: 'text',
       description: '追加のCSSクラス',
+    },
+    enableComparison: {
+      control: 'boolean',
+      description: '比較モードを有効にする',
     },
   },
 } satisfies Meta<typeof MobileVideoPlayer>;
@@ -39,17 +47,23 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     
-    // ビデオ要素が存在することを確認
-    const video = canvas.getByRole('application') as HTMLVideoElement;
-    await expect(video).toBeInTheDocument();
+    // コンポーネントがレンダリングされるまで待つ
+    await waitFor(() => {
+      const videos = canvasElement.querySelectorAll('video');
+      expect(videos.length).toBeGreaterThan(0);
+    });
     
     // 再生ボタンが表示されていることを確認
-    const playButton = canvas.getByRole('button', { name: /play/i });
-    await expect(playButton).toBeInTheDocument();
+    await waitFor(() => {
+      const playButton = canvasElement.querySelector('button svg.lucide-play');
+      expect(playButton).toBeInTheDocument();
+    });
     
     // リスタートボタンが表示されていることを確認
-    const restartButton = canvas.getByRole('button', { name: /rotate/i });
-    await expect(restartButton).toBeInTheDocument();
+    await waitFor(() => {
+      const restartButton = canvasElement.querySelector('button svg.lucide-rotate-ccw');
+      expect(restartButton).toBeInTheDocument();
+    });
     
     // タイムスタンプが表示されていることを確認
     await expect(canvas.getByText(/0:00 \/ 0:00/)).toBeInTheDocument();
@@ -78,26 +92,38 @@ export const PlayPauseInteraction: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     
+    // コンポーネントがレンダリングされるまで待つ
+    await waitFor(() => {
+      const video = canvasElement.querySelector('video');
+      expect(video).toBeInTheDocument();
+    });
+    
     // 初期状態では再生ボタンが表示されている
-    const playButton = canvas.getByRole('button', { name: /play/i });
-    await expect(playButton).toBeInTheDocument();
+    await waitFor(() => {
+      const playIcon = canvasElement.querySelector('button svg.lucide-play');
+      expect(playIcon).toBeInTheDocument();
+    });
     
     // 再生ボタンをクリック
-    await userEvent.click(playButton);
+    const playIcon = canvasElement.querySelector('button svg.lucide-play');
+    const playButton = playIcon?.closest('button');
+    if (playButton) await userEvent.click(playButton);
     
     // 一時停止ボタンに切り替わることを確認
     await waitFor(() => {
-      const pauseButton = canvas.getByRole('button', { name: /pause/i });
-      expect(pauseButton).toBeInTheDocument();
+      const pauseIcon = canvasElement.querySelector('button svg.lucide-pause');
+      expect(pauseIcon).toBeInTheDocument();
     });
     
     // 一時停止ボタンをクリック
-    const pauseButton = canvas.getByRole('button', { name: /pause/i });
-    await userEvent.click(pauseButton);
+    const pauseIcon = canvasElement.querySelector('button svg.lucide-pause');
+    const pauseButton = pauseIcon?.closest('button');
+    if (pauseButton) await userEvent.click(pauseButton);
     
     // 再生ボタンに戻ることを確認
     await waitFor(() => {
-      expect(canvas.getByRole('button', { name: /play/i })).toBeInTheDocument();
+      const playIconAgain = canvasElement.querySelector('button svg.lucide-play');
+      expect(playIconAgain).toBeInTheDocument();
     });
   },
 };
@@ -110,12 +136,19 @@ export const RestartInteraction: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     
+    // コンポーネントがレンダリングされるまで待つ
+    await waitFor(() => {
+      const video = canvasElement.querySelector('video');
+      expect(video).toBeInTheDocument();
+    });
+    
     // ビデオ要素を取得
-    const video = canvas.getByRole('application') as HTMLVideoElement;
+    const video = canvasElement.querySelector('video') as HTMLVideoElement;
     
     // 再生ボタンをクリックして動画を開始
-    const playButton = canvas.getByRole('button', { name: /play/i });
-    await userEvent.click(playButton);
+    const playIcon = canvasElement.querySelector('button svg.lucide-play');
+    const playButton = playIcon?.closest('button');
+    if (playButton) await userEvent.click(playButton);
     
     // 動画が再生されていることを確認
     await waitFor(() => {
@@ -123,8 +156,9 @@ export const RestartInteraction: Story = {
     });
     
     // リスタートボタンをクリック
-    const restartButton = canvas.getByRole('button', { name: /rotate/i });
-    await userEvent.click(restartButton);
+    const restartIcon = canvasElement.querySelector('button svg.lucide-rotate-ccw');
+    const restartButton = restartIcon?.closest('button');
+    if (restartButton) await userEvent.click(restartButton);
     
     // 動画が最初から再生されることを確認
     await waitFor(() => {
@@ -141,6 +175,12 @@ export const ProgressBarInteraction: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    
+    // コンポーネントがレンダリングされるまで待つ
+    await waitFor(() => {
+      const video = canvasElement.querySelector('video');
+      expect(video).toBeInTheDocument();
+    });
     
     // プログレスバーが存在することを確認
     const progressBar = canvas.getByRole('progressbar', { hidden: true });
@@ -180,16 +220,189 @@ export const MobileOptimized: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     
+    // コンポーネントがレンダリングされるまで待つ
+    await waitFor(() => {
+      const video = canvasElement.querySelector('video');
+      expect(video).toBeInTheDocument();
+    });
+    
     // モバイル向けの属性が設定されていることを確認
-    const video = canvas.getByRole('application') as HTMLVideoElement;
+    const video = canvasElement.querySelector('video') as HTMLVideoElement;
     await expect(video).toHaveAttribute('playsinline');
     await expect(video).toHaveAttribute('webkit-playsinline', 'true');
     
     // コントロールが適切なサイズで表示されていることを確認
-    const playButton = canvas.getByRole('button', { name: /play/i });
-    await expect(playButton).toHaveClass('h-6', 'w-6');
+    const playIcon = canvasElement.querySelector('button svg.lucide-play');
+    await expect(playIcon).toHaveClass('h-6', 'w-6');
     
-    const restartButton = canvas.getByRole('button', { name: /rotate/i });
-    await expect(restartButton).toHaveClass('h-5', 'w-5');
+    const restartIcon = canvasElement.querySelector('button svg.lucide-rotate-ccw');
+    await expect(restartIcon).toHaveClass('h-5', 'w-5');
+  },
+};
+
+export const ComparisonMode: Story = {
+  args: {
+    src: sampleVideoUrl,
+    modelSrc: sampleVideoUrl, // 実際のプロジェクトではお手本動画のURLを使用
+    title: 'スイング比較',
+    className: 'w-full h-[400px]',
+    enableComparison: true,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // 比較モードのUIが表示されていることを確認
+    await expect(canvas.getByText('あなた')).toBeInTheDocument();
+    await expect(canvas.getByText('お手本')).toBeInTheDocument();
+    
+    // ユーザーの動画がアクティブ（青色）であることを確認
+    const userLabel = canvas.getByText('あなた').parentElement;
+    await expect(userLabel).toHaveClass('bg-blue-600');
+    
+    // お手本の動画が非アクティブ（グレー）であることを確認
+    const modelLabel = canvas.getByText('お手本').parentElement;
+    await expect(modelLabel).toHaveClass('bg-white/20');
+    
+    // 左右のナビゲーションボタンが表示されていることを確認
+    const leftButton = canvas.getAllByRole('button')[3]; // 左矢印ボタン
+    const rightButton = canvas.getAllByRole('button')[4]; // 右矢印ボタン
+    await expect(leftButton).toBeInTheDocument();
+    await expect(rightButton).toBeInTheDocument();
+    
+    // 左ボタンが無効化されていることを確認（最初はユーザー動画）
+    await expect(leftButton).toBeDisabled();
+  },
+};
+
+export const ComparisonSwipe: Story = {
+  args: {
+    src: sampleVideoUrl,
+    modelSrc: sampleVideoUrl,
+    title: 'スワイプテスト',
+    className: 'w-full h-[400px]',
+    enableComparison: true,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // 初期状態を確認
+    const userLabel = canvas.getByText('あなた').parentElement;
+    await expect(userLabel).toHaveClass('bg-blue-600');
+    
+    // 右矢印ボタンをクリックしてお手本に切り替え
+    const rightButton = canvas.getAllByRole('button')[4];
+    await userEvent.click(rightButton);
+    
+    // お手本がアクティブになったことを確認
+    await waitFor(() => {
+      const modelLabel = canvas.getByText('お手本').parentElement;
+      expect(modelLabel).toHaveClass('bg-green-600');
+    });
+    
+    // ユーザーが非アクティブになったことを確認
+    await expect(userLabel).toHaveClass('bg-white/20');
+    
+    // 左矢印ボタンをクリックしてユーザーに戻る
+    const leftButton = canvas.getAllByRole('button')[3];
+    await userEvent.click(leftButton);
+    
+    // ユーザーがアクティブに戻ったことを確認
+    await waitFor(() => {
+      expect(userLabel).toHaveClass('bg-blue-600');
+    });
+  },
+};
+
+export const ComparisonTouchSwipe: Story = {
+  args: {
+    src: sampleVideoUrl,
+    modelSrc: sampleVideoUrl,
+    title: 'タッチスワイプ',
+    className: 'w-full h-[400px]',
+    enableComparison: true,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const container = canvasElement.querySelector('.relative.bg-black');
+    
+    if (!container) return;
+    
+    // 初期状態を確認
+    const userLabel = canvas.getByText('あなた').parentElement;
+    await expect(userLabel).toHaveClass('bg-blue-600');
+    
+    // 左スワイプをシミュレート（お手本に切り替え）
+    fireEvent.touchStart(container, {
+      touches: [{ clientX: 200, clientY: 200 }],
+    });
+    fireEvent.touchMove(container, {
+      touches: [{ clientX: 100, clientY: 200 }],
+    });
+    fireEvent.touchEnd(container, {});
+    
+    // お手本がアクティブになったことを確認
+    await waitFor(() => {
+      const modelLabel = canvas.getByText('お手本').parentElement;
+      expect(modelLabel).toHaveClass('bg-green-600');
+    });
+    
+    // 右スワイプをシミュレート（ユーザーに戻る）
+    fireEvent.touchStart(container, {
+      touches: [{ clientX: 100, clientY: 200 }],
+    });
+    fireEvent.touchMove(container, {
+      touches: [{ clientX: 200, clientY: 200 }],
+    });
+    fireEvent.touchEnd(container, {});
+    
+    // ユーザーがアクティブに戻ったことを確認
+    await waitFor(() => {
+      expect(userLabel).toHaveClass('bg-blue-600');
+    });
+  },
+};
+
+export const ComparisonVideoSync: Story = {
+  args: {
+    src: sampleVideoUrl,
+    modelSrc: sampleVideoUrl,
+    title: '動画同期',
+    className: 'w-full h-[400px]',
+    enableComparison: true,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // 再生ボタンをクリック
+    const playIcon = canvasElement.querySelector('button svg.lucide-play');
+    const playButton = playIcon?.closest('button');
+    if (playButton) await userEvent.click(playButton);
+    
+    // 動画が再生されていることを確認
+    await waitFor(() => {
+      const pauseIcon = canvasElement.querySelector('button svg.lucide-pause');
+      expect(pauseIcon).toBeInTheDocument();
+    });
+    
+    // お手本に切り替え
+    const rightButton = canvas.getAllByRole('button')[4];
+    await userEvent.click(rightButton);
+    
+    // お手本も再生されていることを確認（同期されている）
+    await waitFor(() => {
+      const pauseButton = canvas.getByRole('button', { name: /pause/i });
+      expect(pauseButton).toBeInTheDocument();
+    });
+    
+    // 一時停止
+    const pauseIcon = canvasElement.querySelector('button svg.lucide-pause');
+    const pauseButton = pauseIcon?.closest('button');
+    if (pauseButton) await userEvent.click(pauseButton);
+    
+    // 両方の動画が停止していることを確認
+    await waitFor(() => {
+      const playIconAgain = canvasElement.querySelector('button svg.lucide-play');
+      expect(playIconAgain).toBeInTheDocument();
+    });
   },
 };
