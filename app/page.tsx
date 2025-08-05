@@ -430,44 +430,12 @@ function GolfFitter() {
           </Card>
 
           <div className="space-y-4">
-            {/* メインアクションボタン */}
-            <div className="text-center mb-2">
-              <p className="text-sm text-gray-600 mb-2">次のステップを選択してください</p>
-            </div>
-            <div className="flex justify-center gap-4">
-              <Button
-                onClick={() => setCurrentStep('swing-analysis')}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                スイング分析
-              </Button>
+            {/* スイング比較ボタン */}
+            <div className="text-center">
               <Link href={`/swing-comparison?video2=${currentVideoIndex === 0 ? 'test.mp4' : 'test2.mp4'}&proName=${matchedPro.name}`}>
                 <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 border-2 border-red-500">
                   <BarChart3 className="w-4 h-4 mr-2" />
                   スイング比較
-                </Button>
-              </Link>
-            </div>
-            
-            {/* サブアクションボタン */}
-            <div className="flex justify-center gap-4 flex-wrap">
-              <Button 
-                onClick={() => {
-                  // セッションストレージをクリア
-                  sessionStorage.removeItem('matchedPro');
-                  sessionStorage.removeItem('userData');
-                  setCurrentStep('input');
-                }} 
-                variant="outline"
-              >
-                再診断する
-              </Button>
-              <Button className="bg-green-600 hover:bg-green-700">
-                結果を保存
-              </Button>
-              <Link href="/videos">
-                <Button className="bg-purple-600 hover:bg-purple-700">
-                  動画を見る
                 </Button>
               </Link>
             </div>
