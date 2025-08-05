@@ -12,6 +12,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:watch": "vitest --watch",
+    "test-storybook": "test-storybook",
+    "test-storybook:ci": "storybook build && test-storybook --maxWorkers=2",
     "typecheck": "tsc --noEmit",
     "sync:claude-cursor": "node scripts/sync-claude-cursor.js"
   },
@@ -41,6 +43,7 @@
     "@storybook/addon-onboarding": "^9.1.1",
     "@storybook/addon-vitest": "^9.1.1",
     "@storybook/nextjs-vite": "^9.1.1",
+    "@storybook/test-runner": "^0.23.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
