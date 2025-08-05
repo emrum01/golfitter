@@ -5,22 +5,27 @@ pre-commit:
   parallel: true
   commands:
     lint:
-      glob: "*.{js,jsx,ts,tsx}"
+      glob: '*.{js,jsx,ts,tsx}'
       run: npm run lint
-    
+
     typecheck:
       run: npm run typecheck || true
-    
+
     test:
       run: npm run test -- --run
-      
+
 commit-msg:
   commands:
     commitlint:
       run: |
         # コミットメッセージの形式をチェック
         commit_regex='^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?: .{1,}$'
+        merge_regex='^Merge\s'
         commit_msg=$(cat {1})
+        # マージコミットの場合はチェックをスキップ
+        if echo "$commit_msg" | grep -qE "$merge_regex"; then
+          exit 0
+        fi
         if ! echo "$commit_msg" | grep -qE "$commit_regex"; then
           echo "コミットメッセージが規約に従っていません。"
           echo "形式: <type>(<scope>): <subject>"

@@ -24,7 +24,7 @@ import {
   Trash2,
   FolderOpen,
 } from 'lucide-react';
-import { videoStorage, StoredVideo } from '@/lib/video-storage';
+import { videoStorage, type StoredVideo } from '@/lib/video-storage';
 
 interface SwingAnalysisResult {
   overallScore: number;

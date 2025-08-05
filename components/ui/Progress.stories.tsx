@@ -159,7 +159,7 @@ export const StepProgress: Story = {
 
     return (
       <div className="w-full max-w-md space-y-4">
-        {steps.map((step, index) => (
+        {steps.map((step) => (
           <div key={step.name}>
             <div className="flex justify-between text-sm mb-1">
               <span className={step.value > 0 ? 'font-medium' : 'text-gray-500'}>
