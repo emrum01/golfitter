@@ -18,6 +18,10 @@
     "test:watch": "vitest --watch",
     "test-storybook": "test-storybook",
     "test-storybook:ci": "storybook build && test-storybook --maxWorkers=2",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
     "typecheck": "tsc --noEmit",
     "sync:claude-cursor": "node scripts/sync-claude-cursor.js"
   },
