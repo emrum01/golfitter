@@ -340,3 +340,121 @@ export const AnalysisWithCallbacks: Story = {
     }, { timeout: 3000 });
   },
 }; 
+
+export const AnalysisResultWithVideos: Story = {
+  args: {
+    onBack: fn(),
+    onAnalysisComplete: fn(),
+    analysisResult: mockAnalysisResult,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // 分析結果が表示されることを確認
+    await expect(canvas.getByText('分析結果')).toBeInTheDocument();
+    await expect(canvas.getByText('総合スコア: 85')).toBeInTheDocument();
+    
+    // 動画も表示されていることを確認
+    await expect(canvas.getByText('動画1')).toBeInTheDocument();
+    await expect(canvas.getByText('動画2')).toBeInTheDocument();
+    
+    // 動画プレイヤーが存在することを確認
+    const videos = canvas.getAllByRole('video');
+    await expect(videos).toHaveLength(2);
+    
+    // グラフが表示されることを確認
+    await expect(canvas.getByText('総合スコア')).toBeInTheDocument();
+    await expect(canvas.getByText('詳細分析グラフ')).toBeInTheDocument();
+  },
+};
+
+export const AnalysisResultWithVideosVertical: Story = {
+  args: {
+    onBack: fn(),
+    onAnalysisComplete: fn(),
+    analysisResult: mockAnalysisResult,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // 分析結果が上部に表示されることを確認
+    await expect(canvas.getByText('分析結果')).toBeInTheDocument();
+    await expect(canvas.getByText('総合スコア: 85')).toBeInTheDocument();
+    
+    // 動画が下部に表示されることを確認
+    await expect(canvas.getByText('比較動画')).toBeInTheDocument();
+    await expect(canvas.getByText('動画1')).toBeInTheDocument();
+    await expect(canvas.getByText('動画2')).toBeInTheDocument();
+    
+    // 動画プレイヤーが存在することを確認
+    const videos = canvas.getAllByRole('video');
+    await expect(videos).toHaveLength(2);
+    
+    // グラフが表示されることを確認
+    await expect(canvas.getByText('総合スコア')).toBeInTheDocument();
+    await expect(canvas.getByText('詳細分析グラフ')).toBeInTheDocument();
+  },
+};
+
+export const AnalysisResultWithVideosTop: Story = {
+  args: {
+    onBack: fn(),
+    onAnalysisComplete: fn(),
+    analysisResult: mockAnalysisResult,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // 動画が一番上に表示されることを確認
+    await expect(canvas.getByText('比較動画')).toBeInTheDocument();
+    await expect(canvas.getByText('動画1')).toBeInTheDocument();
+    await expect(canvas.getByText('動画2')).toBeInTheDocument();
+    
+    // 動画プレイヤーが存在することを確認
+    const videos = canvas.getAllByRole('video');
+    await expect(videos).toHaveLength(2);
+    
+    // ボタンが比較動画セクションに表示されることを確認
+    await expect(canvas.getByRole('button', { name: '新しい動画で分析' })).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: '診断結果に戻る' })).toBeInTheDocument();
+    
+    // 動画1の詳細分析ボタンが存在しないことを確認
+    const detailedAnalysisButton = canvas.queryByRole('button', { name: /動画1の詳細分析/ });
+    expect(detailedAnalysisButton).not.toBeInTheDocument();
+    
+    // 分析結果が動画の下に表示されることを確認
+    await expect(canvas.getByText('分析結果')).toBeInTheDocument();
+    await expect(canvas.getByText('総合スコア: 85')).toBeInTheDocument();
+    
+    // グラフが表示されることを確認
+    await expect(canvas.getByText('総合スコア')).toBeInTheDocument();
+    await expect(canvas.getByText('詳細分析グラフ')).toBeInTheDocument();
+  },
+};
+
+export const NewAnalysisButton: Story = {
+  args: {
+    onBack: fn(),
+    onAnalysisComplete: fn(),
+    analysisResult: mockAnalysisResult,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // 新しい動画で分析ボタンをクリック
+    const newAnalysisButton = canvas.getByRole('button', { name: '新しい動画で分析' });
+    await userEvent.click(newAnalysisButton);
+    
+    // 初期画面に戻ることを確認（分析結果が表示されない）
+    await expect(canvas.queryByText('分析結果')).not.toBeInTheDocument();
+    await expect(canvas.queryByText('総合スコア: 85')).not.toBeInTheDocument();
+    
+    // 動画アップロード画面が表示されることを確認
+    await expect(canvas.getByText('スイング比較分析')).toBeInTheDocument();
+    await expect(canvas.getByText('動画1をアップロード')).toBeInTheDocument();
+    await expect(canvas.getByText('動画2をアップロード')).toBeInTheDocument();
+    
+    // 動画2はセットされたままであることを確認
+    await expect(canvas.getByText('動画2')).toBeInTheDocument();
+  },
+}; 
