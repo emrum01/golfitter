@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import { MobileVideoPlayer } from '@/components/mobile-video-player';
 import { videoStorage } from '@/lib/video-storage';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { BackToAnalysisButton } from '@/components/back-to-analysis-button';
 import Link from 'next/link';
 
 import 'swiper/css';
@@ -23,24 +24,48 @@ interface Video {
 export default function VideosPage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
+  const [initialSlide, setInitialSlide] = useState(0);
+  const [returnTo, setReturnTo] = useState<string>('');
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const loadVideos = async () => {
       try {
-        const allVideos = await videoStorage.getAllVideos();
-        const videoList: Video[] = [];
+        // URLパラメータから動画データを取得
+        const videosParam = searchParams.get('videos');
+        const initialIndexParam = searchParams.get('initialIndex');
+        const returnToParam = searchParams.get('returnTo');
 
-        for (const video of allVideos) {
-          const url = videoStorage.getVideoUrl(video);
-          videoList.push({
-            id: video.id,
-            name: video.name,
-            url,
-            uploadedAt: video.uploadedAt,
-          });
+        if (videosParam) {
+          // URLパラメータから動画データをパース
+          const parsedVideos = JSON.parse(videosParam);
+          const videoList: Video[] = parsedVideos.map((video: { src: string; title: string }, index: number) => ({
+            id: `comparison-${index}`,
+            name: video.title,
+            url: video.src,
+            uploadedAt: new Date(),
+          }));
+
+          setVideos(videoList);
+          setInitialSlide(initialIndexParam ? parseInt(initialIndexParam, 10) : 0);
+          setReturnTo(returnToParam || '');
+        } else {
+          // 通常の動画リスト表示
+          const allVideos = await videoStorage.getAllVideos();
+          const videoList: Video[] = [];
+
+          for (const video of allVideos) {
+            const url = videoStorage.getVideoUrl(video);
+            videoList.push({
+              id: video.id,
+              name: video.name,
+              url,
+              uploadedAt: video.uploadedAt,
+            });
+          }
+
+          setVideos(videoList);
         }
-
-        setVideos(videoList);
       } catch (error) {
         console.error('Failed to load videos:', error);
       } finally {
@@ -53,13 +78,13 @@ export default function VideosPage() {
     // クリーンアップ関数
     return () => {
       videos.forEach(video => {
-        if (video.url) {
+        if (video.url && !video.url.startsWith('http')) {
           URL.revokeObjectURL(video.url);
         }
       });
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams]);
 
   if (loading) {
     return (
@@ -80,18 +105,21 @@ export default function VideosPage() {
     );
   }
 
+
   return (
     <div className="h-screen bg-black relative">
-      <div className="absolute top-4 left-4 z-20">
-        <Link href="/?currentStep=results">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white hover:bg-white/20"
-          >
-            <ArrowLeft className="h-6 w-6" />
-          </Button>
-        </Link>
+      <div className="absolute top-4 left-4 z-20 flex gap-2">
+        <BackToAnalysisButton 
+          variant="arrow" 
+          size="icon"
+        />
+        
+        {returnTo === 'swing-comparison' && (
+          <BackToAnalysisButton 
+            variant="text" 
+            size="sm"
+          />
+        )}
       </div>
 
       <Swiper
@@ -100,14 +128,17 @@ export default function VideosPage() {
         slidesPerView={1}
         navigation
         pagination={{ clickable: true }}
+        initialSlide={initialSlide}
         className="h-full"
       >
         {videos.map((video, index) => (
           <SwiperSlide key={video.id}>
             <MobileVideoPlayer
               src={video.url}
+              modelSrc={videos.length === 2 && index === 0 ? videos[1].url : undefined}
               title={`${video.name} (${index + 1}/${videos.length})`}
               className="h-full"
+              enableComparison={videos.length === 2}
             />
           </SwiperSlide>
         ))}
