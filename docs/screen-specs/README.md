@@ -19,11 +19,11 @@
 
 | ファイル名 | 画面名 | URL | 説明 |
 |-----------|--------|-----|------|
-| [010_home.md](./010_home.md) | ホーム画面 | / | アプリケーションのメイン画面、診断機能を提供 |
+| [010_home.md](./010_home.md) | ホーム画面（ゴルフフィッター） | / | AI診断で最適なプロゴルファーとクラブセットを提案（認証必須） |
 | [020_auth-callback_認証コールバック.spec.md](./020_auth-callback_認証コールバック.spec.md) | 認証コールバック | /auth/callback | 外部認証プロバイダーからのリダイレクトを処理 |
-| [030_swing-comparison_スイング比較.spec.md](./030_swing-comparison_スイング比較.spec.md) | スイング比較 | /swing-comparison | 複数のスイング動画を比較分析 |
-| [040_swing-upload_スイングアップロード.spec.md](./040_swing-upload_スイングアップロード.spec.md) | スイングアップロード | /swing-upload | スイング動画のアップロードと管理（要認証） |
-| [050_videos_動画一覧.spec.md](./050_videos_動画一覧.spec.md) | 動画一覧 | /videos | 保存済み動画のスワイプ可能なビューアー |
+| [030_swing-comparison_スイング比較.spec.md](./030_swing-comparison_スイング比較.spec.md) | スイング比較 | /swing-comparison | 複数のスイング動画を比較分析（URLパラメータでプリセット可能） |
+| [040_swing-upload_スイングアップロード.spec.md](./040_swing-upload_スイングアップロード.spec.md) | スイングアップロード | /swing-upload | スイング動画のアップロードと管理、分析開始（認証必須） |
+| [050_videos_動画一覧.spec.md](./050_videos_動画一覧.spec.md) | 動画一覧 | /videos | 保存済み動画のスワイプ可能なビューアー（モバイル最適化） |
 
 ## 仕様書の作成・更新ルール
 
