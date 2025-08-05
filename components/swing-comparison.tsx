@@ -19,12 +19,10 @@ import {
   TrendingUp,
   Video,
   ArrowLeft,
-  BarChart3,
 } from 'lucide-react';
-import type { SwingComparisonProps } from '@/lib/types/swing-analysis';
+import type { SwingComparisonProps, AnalysisResult } from '@/lib/types/swing-analysis';
 import { mockAnalysisResult, mockDetailedAnalysisData } from '@/lib/mocks/swing-analysis';
 import { getScoreBadgeVariant } from '@/lib/utils/score-utils';
-import { DetailedSwingAnalysis } from './detailed-swing-analysis';
 import { SwingAnalysisGraphs } from './swing-analysis-graphs';
 
 export function SwingComparison({
@@ -42,7 +40,6 @@ export function SwingComparison({
   const [video2Url, setVideo2Url] = useState<string>('');
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [presetVideo2DisplayName, setPresetVideo2DisplayName] = useState<string>('');
-  const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false);
   const fileInput1Ref = useRef<HTMLInputElement>(null);
   const fileInput2Ref = useRef<HTMLInputElement>(null);
 
@@ -94,11 +91,12 @@ export function SwingComparison({
   };
 
   const handleRetry = () => {
+    // 動画1のみをリセット、動画2は保持
     setVideo1(null);
-    setVideo2(null);
     setVideo1Url('');
-    setVideo2Url('');
     setAnalysisProgress(0);
+    // 分析結果もリセット
+    onAnalysisComplete?.(null as unknown as AnalysisResult);
   };
 
   const canAnalyze = video1 && (video2 || presetVideo2) && !isLoading;
@@ -135,51 +133,132 @@ export function SwingComparison({
 
   if (analysisResult) {
     return (
-      <div className="container mx-auto p-6 max-w-4xl">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              分析結果
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-2">
-                総合スコア: {analysisResult.overallScore}
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center">
-                  <Badge variant={getScoreBadgeVariant(analysisResult.tempo.score)}>
-                    テンポ: {analysisResult.tempo.score}
-                  </Badge>
+      <div className="container mx-auto p-6 max-w-6xl">
+        <div className="space-y-6">
+          {/* 動画表示エリア */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Video className="h-5 w-5" />
+                比較動画
+              </CardTitle>
+              <CardDescription>
+                分析対象の動画を確認できます
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                {/* 動画1 */}
+                <div>
+                  <h3 className="font-semibold mb-3">動画1</h3>
+                  {video1Url ? (
+                    <div className="space-y-2">
+                      <video
+                        src={video1Url}
+                        className="w-full h-64 object-cover rounded"
+                        controls
+                      />
+                      <p className="text-sm text-gray-600">{video1?.name}</p>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                      <Upload className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-600">動画1</p>
+                    </div>
+                  )}
                 </div>
-                <div className="text-center">
-                  <Badge variant={getScoreBadgeVariant(analysisResult.posture.score)}>
-                    姿勢: {analysisResult.posture.score}
-                  </Badge>
-                </div>
-                <div className="text-center">
-                  <Badge variant={getScoreBadgeVariant(analysisResult.balance.score)}>
-                    バランス: {analysisResult.balance.score}
-                  </Badge>
-                </div>
-                <div className="text-center">
-                  <Badge variant={getScoreBadgeVariant(analysisResult.clubPath.score)}>
-                    クラブパス: {analysisResult.clubPath.score}
-                  </Badge>
+
+                {/* 動画2 */}
+                <div>
+                  <h3 className="font-semibold mb-3">
+                    動画2 {presetVideo2 && <span className="text-sm text-blue-600">(プロのスイング)</span>}
+                  </h3>
+                  {video2Url ? (
+                    <div className="space-y-2">
+                      <video
+                        src={video2Url}
+                        className="w-full h-64 object-cover rounded"
+                        controls
+                      />
+                      <p className="text-sm text-gray-600">
+                        {presetVideo2 ? presetVideo2DisplayName : video2?.name}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                      <Upload className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-600">動画2</p>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
 
-            {/* グラフ表示 */}
-            <div className="mb-6">
+              {/* アクションボタン */}
+              <div className="flex gap-2 flex-wrap justify-center pt-4 border-t">
+                <Button onClick={handleRetry} variant="outline">
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  新しい動画で分析
+                </Button>
+                <Button onClick={onBack} variant="outline">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  診断結果に戻る
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 分析結果エリア */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                分析結果
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-2">
+                  総合スコア: {analysisResult.overallScore}
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <div className="text-center">
+                    <Badge variant={getScoreBadgeVariant(analysisResult.tempo.score)}>
+                      テンポ: {analysisResult.tempo.score}
+                    </Badge>
+                  </div>
+                  <div className="text-center">
+                    <Badge variant={getScoreBadgeVariant(analysisResult.posture.score)}>
+                      姿勢: {analysisResult.posture.score}
+                    </Badge>
+                  </div>
+                  <div className="text-center">
+                    <Badge variant={getScoreBadgeVariant(analysisResult.balance.score)}>
+                      バランス: {analysisResult.balance.score}
+                    </Badge>
+                  </div>
+                  <div className="text-center">
+                    <Badge variant={getScoreBadgeVariant(analysisResult.clubPath.score)}>
+                      クラブパス: {analysisResult.clubPath.score}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* グラフ表示 */}
               <SwingAnalysisGraphs analysisData={mockDetailedAnalysisData} />
-            </div>
+            </CardContent>
+          </Card>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold mb-2 text-green-600">強み</h4>
+          {/* 強みと改善点 */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-green-600">
+                  <CheckCircle className="h-4 w-4" />
+                  強み
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
                 <ul className="space-y-1">
                   {analysisResult.strengths.map((strength, index) => (
                     <li key={index} className="flex items-center gap-2">
@@ -188,9 +267,17 @@ export function SwingComparison({
                     </li>
                   ))}
                 </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2 text-orange-600">改善点</h4>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-orange-600">
+                  <AlertCircle className="h-4 w-4" />
+                  改善点
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
                 <ul className="space-y-1">
                   {analysisResult.improvements.map((improvement, index) => (
                     <li key={index} className="flex items-center gap-2">
@@ -199,41 +286,17 @@ export function SwingComparison({
                     </li>
                   ))}
                 </ul>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
+          </div>
 
-            <div className="mt-6 flex gap-2 flex-wrap">
-              <Button 
-                onClick={() => setShowDetailedAnalysis(true)}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <BarChart3 className="h-4 w-4 mr-2" />
-                動画1の詳細分析
-              </Button>
-              <Button onClick={handleRetry} variant="outline">
-                <RotateCcw className="h-4 w-4 mr-2" />
-                新しい動画で分析
-              </Button>
-              <Button onClick={onBack} variant="outline">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                診断結果に戻る
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+
+        </div>
       </div>
     );
   }
 
-  // 詳細分析モーダル
-  if (showDetailedAnalysis) {
-    return (
-      <DetailedSwingAnalysis
-        analysisData={mockDetailedAnalysisData}
-        onClose={() => setShowDetailedAnalysis(false)}
-      />
-    );
-  }
+
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
