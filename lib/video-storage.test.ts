@@ -107,9 +107,9 @@ class MockIDBDatabase {
       length: 0,
       contains: (name: string) => this.objectStores.has(name),
       item: (index: number) => Array.from(this.objectStores.keys())[index],
-      [Symbol.iterator]: function* () {
+      [Symbol.iterator]: function* (this: MockIDBDatabase) {
         yield* Array.from(this.objectStores.keys());
-      }
+      }.bind(this)
     } as DOMStringList;
   }
 

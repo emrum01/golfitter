@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { within, userEvent, expect, waitFor, fireEvent } from 'storybook/test';
+import { within, userEvent, expect, waitFor } from 'storybook/test';
 import { vi } from 'vitest';
 import { MobileVideoPlayer } from './mobile-video-player';
 
@@ -46,7 +46,6 @@ export const Default: Story = {
     className: 'w-full h-[400px]',
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -78,7 +77,6 @@ export const WithTitle: Story = {
     className: 'w-full h-[400px]',
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     
     // タイトルが表示されていることを確認
     await expect(canvas.getByText('ゴルフスイング解析')).toBeInTheDocument();
@@ -91,7 +89,6 @@ export const PlayPauseInteraction: Story = {
     className: 'w-full h-[400px]',
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -155,7 +152,6 @@ export const RestartInteraction: Story = {
     className: 'w-full h-[400px]',
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -221,7 +217,6 @@ export const ProgressBarInteraction: Story = {
     className: 'w-full h-[400px]',
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -279,7 +274,6 @@ export const MobileOptimized: Story = {
     className: 'w-full h-[300px] sm:h-[400px]',
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -313,7 +307,6 @@ export const ComparisonMode: Story = {
     enableComparison: true,
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -355,7 +348,6 @@ export const ComparisonSwipe: Story = {
     enableComparison: true,
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -417,7 +409,6 @@ export const ComparisonTouchSwipe: Story = {
     enableComparison: true,
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -465,7 +456,6 @@ export const ComparisonVideoSync: Story = {
     enableComparison: true,
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     
     // すべてのビデオ要素を取得してモック
     const videos = canvasElement.querySelectorAll('video');

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SwingComparison } from '@/components/swing-comparison';
 import type { AnalysisResult } from '@/lib/types/swing-analysis';
 
-export default function SwingComparisonPage() {
+function SwingComparisonContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -39,5 +39,13 @@ export default function SwingComparisonPage() {
         presetVideo2Name={proNameParam ? `${proNameParam}のスイング` : undefined}
       />
     </div>
+  );
+}
+
+export default function SwingComparisonPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">読み込み中...</div>}>
+      <SwingComparisonContent />
+    </Suspense>
   );
 } 

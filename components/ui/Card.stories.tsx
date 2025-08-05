@@ -80,7 +80,7 @@ export const ContentOnly: Story = {
     <Card className="w-[350px]">
       <CardContent>
         <p className="text-sm">This card only has content, no header or footer.</p>
-        <p className="text-sm mt-2">It's useful for simple content blocks.</p>
+        <p className="text-sm mt-2">It&apos;s useful for simple content blocks.</p>
       </CardContent>
     </Card>
   ),

@@ -22,7 +22,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Upload, User, Target, Activity, BarChart3, ChevronLeft, ChevronRight } from 'lucide-react';
-import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SwingAnalysis from '@/components/swing-analysis';
 import { MobileVideoPlayer } from '@/components/mobile-video-player';
@@ -153,9 +152,6 @@ function GolfFitter() {
     budget: 0,
   });
   const [matchedPro, setMatchedPro] = useState<ProGolfer | null>(null);
-  const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
-  const [videoUrl, setVideoUrl] = useState<string>('');
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
 
   // URLパラメータからcurrentStepを読み取る
