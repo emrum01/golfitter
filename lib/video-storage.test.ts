@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { videoStorage, StoredVideo } from './video-storage';
+import { videoStorage, type StoredVideo } from './video-storage';
 
 // IndexedDBのモック
 const mockIndexedDB = {

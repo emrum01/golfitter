@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { within, userEvent, expect, waitFor } from 'storybook/test';
+import { userEvent, expect, waitFor } from 'storybook/test';
 import { vi } from 'vitest';
 import { MobileVideoPlayer } from './mobile-video-player';
 
@@ -45,7 +45,7 @@ export const Default: Story = {
     src: sampleVideoUrl,
     className: 'w-full h-[400px]',
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvas, canvasElement }) => {
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -76,7 +76,7 @@ export const WithTitle: Story = {
     title: 'ゴルフスイング解析',
     className: 'w-full h-[400px]',
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvas }) => {
     
     // タイトルが表示されていることを確認
     await expect(canvas.getByText('ゴルフスイング解析')).toBeInTheDocument();
@@ -216,7 +216,7 @@ export const ProgressBarInteraction: Story = {
     src: sampleVideoUrl,
     className: 'w-full h-[400px]',
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvas, canvasElement }) => {
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -306,7 +306,7 @@ export const ComparisonMode: Story = {
     className: 'w-full h-[400px]',
     enableComparison: true,
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvas, canvasElement }) => {
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -347,7 +347,7 @@ export const ComparisonSwipe: Story = {
     className: 'w-full h-[400px]',
     enableComparison: true,
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvas, canvasElement }) => {
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -408,7 +408,7 @@ export const ComparisonTouchSwipe: Story = {
     className: 'w-full h-[400px]',
     enableComparison: true,
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvas, canvasElement }) => {
     
     // コンポーネントがレンダリングされるまで待つ
     await waitFor(() => {
@@ -455,7 +455,7 @@ export const ComparisonVideoSync: Story = {
     className: 'w-full h-[400px]',
     enableComparison: true,
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvas, canvasElement }) => {
     
     // すべてのビデオ要素を取得してモック
     const videos = canvasElement.querySelectorAll('video');

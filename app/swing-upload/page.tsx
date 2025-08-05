@@ -6,7 +6,7 @@ import { ProtectedRoute } from '@/components/protected-route';
 import { VideoUpload } from '@/components/video-upload';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
-import { videoStorage, StoredVideo } from '@/lib/video-storage';
+import { videoStorage, type StoredVideo } from '@/lib/video-storage';
 import {
   Card,
   CardContent,
