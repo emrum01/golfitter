@@ -111,6 +111,118 @@ bun dev
 3. 認証成功後、アプリケーションにリダイレクト
 4. ユーザーセッションの管理
 
+## 設計思想
+
+このプロジェクトは、スケーラブルな Web アプリケーション開発の実践例として設計されています。
+
+### 開発プロセス
+
+#### TDD + Storybook による体系的な開発サイクル
+
+**🔴 RED Phase**: テストファーストで期待動作を定義
+```bash
+# 1. Storybook ファイル作成
+touch ComponentName.stories.tsx
+
+# 2. play 関数で失敗するテストを記述
+npm run storybook  # 失敗確認
+```
+
+**🟢 GREEN Phase**: 最小実装でテストを通す
+```bash
+# 3. コンポーネント実装
+touch ComponentName.tsx
+
+# 4. テスト通過確認
+npm run test -- ComponentName.stories
+```
+
+**🔵 REFACTOR Phase**: コード品質向上
+```bash
+# 5. リファクタリング実行
+npm run lint && npm run typecheck
+```
+
+#### 実装されている開発支援の仕組み
+
+**ファイル監視とホットリロード:**
+- Next.js Turbopack: 高速な開発サーバー
+- Storybook HMR: コンポーネント変更の即座反映
+- Vitest watch mode: テスト自動実行
+
+**開発効率化ツール:**
+```bash
+npm run test:ui        # Vitest UI でテスト状況を視覚化
+npm run test:e2e:ui    # Playwright UI でE2Eテストをデバッグ
+npm run storybook      # コンポーネント開発環境
+```
+
+**型安全性による開発支援:**
+- Props インターフェースによる自動補完
+- コンパイル時エラー検出
+- リファクタリング時の影響範囲の自動検出
+
+### アーキテクチャ
+
+```
+app/○○○○/page.tsx          # Server Components
+app/○○○○/○○○○Page.tsx      # Client Components  
+app/○○○○/_components/      # ページ固有のコンポーネント
+components/                # 再利用可能なコンポーネント
+```
+
+**コンポーネント設計：**
+- Atomic Design パターンによる階層化
+- shadcn/ui をベースとした一貫性のある UI
+- Props の型定義によるインターフェースの明確化
+
+### 品質保証
+
+#### 多層防御の品質チェック
+
+```bash
+# 静的解析（複数ツール）
+npm run lint          # ESLint - コード品質とルール
+npm run lint:biome    # Biome - フォーマット + Lint（自動修正）
+npm run typecheck     # TypeScript - 型安全性
+
+# テスト（各レイヤー）
+npm run test          # Vitest - ユニット/統合テスト
+npm run storybook     # Storybook - コンポーネントテスト
+npm run test:e2e      # Playwright - E2Eテスト
+```
+
+#### Git フック（lefthook）による自動品質チェック
+
+**pre-commit**: コミット前に自動実行
+```yaml
+parallel: true  # 並列実行で高速化
+commands:
+  lint: ESLint チェック
+  typecheck: 型チェック  
+  test: テスト実行（--run モード）
+```
+
+**commit-msg**: コミットメッセージ規約チェック
+- Conventional Commits 形式の強制
+- `feat:`, `fix:`, `docs:` 等の適切なプレフィックス
+
+#### 品質基準
+
+**コードスタイル統一:**
+- Biome: 80文字幅、2スペースインデント、セミコロン最小化
+- 未使用変数/インポートの自動削除
+- import/export の型分離
+
+**型安全性:**
+- `--noEmit` での厳密な型チェック
+- any型の禁止（実装ルールで明文化）
+
+**テストカバレッジ:**
+- コンポーネント単位の Storybook play 関数テスト
+- ユーザージャーニーの E2E テスト
+- 非同期処理とエラーハンドリングの検証
+
 ## プロジェクト構造
 
 ```
@@ -132,29 +244,65 @@ golfitter/
 └── scripts/              # データベーススクリプト
 ```
 
-## 開発
+## 開発ワークフロー
 
-### 利用可能なスクリプト
+### 新機能開発の標準フロー
 
+#### 1. ブランチ作成とセットアップ
 ```bash
-# 開発サーバーの起動
-npm run dev
-
-# ビルド
-npm run build
-
-# 本番サーバーの起動
-npm start
-
-# リンターの実行
-npm run lint
+git checkout -b feat/feature-name
+npm run dev  # 開発サーバー起動
 ```
 
-### コードスタイル
+#### 2. TDD サイクルでの実装
+```bash
+# 🔴 RED: テスト作成
+touch components/FeatureName/FeatureName.stories.tsx
+npm run storybook  # localhost:6006
 
-- TypeScriptを使用
-- ESLintとPrettierでコードフォーマット
-- コンベンショナルコミットメッセージ
+# 🟢 GREEN: 実装
+touch components/FeatureName/FeatureName.tsx
+npm run test -- FeatureName.stories
+
+# 🔵 REFACTOR: 品質向上
+npm run lint:biome && npm run typecheck
+```
+
+#### 3. 品質チェックと統合
+```bash
+# 各種テスト実行
+npm run test:e2e      # E2Eテスト
+npm run build         # 本番ビルド確認
+
+# Git フックで自動チェック
+git add . && git commit -m "feat: 新機能を追加"
+```
+
+### スクリプト一覧
+
+**開発用:**
+```bash
+npm run dev           # 開発サーバー（Turbopack）
+npm run storybook     # コンポーネント開発環境
+npm run test:watch    # テスト監視モード
+npm run test:ui       # Vitest UI
+```
+
+**品質チェック:**
+```bash
+npm run lint          # ESLint
+npm run lint:biome    # Biome（フォーマット+Lint）
+npm run typecheck     # TypeScript型チェック
+npm run test          # 全テスト実行
+npm run test:e2e      # E2Eテスト（Playwright）
+```
+
+**ビルド:**
+```bash
+npm run build         # 本番ビルド
+npm run start         # 本番サーバー起動
+npm run build-storybook  # Storybook ビルド
+```
 
 ## デプロイ
 

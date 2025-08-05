@@ -51,67 +51,41 @@ export function MobileVideoPlayer({
     };
   }, [activeVideo]);
 
-  useEffect(() => {
-    if (!enableComparison) return;
-    
-    // 動画を同期させる
-    const userVideo = videoRef.current;
-    const modelVideo = modelVideoRef.current;
-    
-    if (userVideo && modelVideo) {
-      const syncVideos = () => {
-        const activeVid = activeVideo === 'user' ? userVideo : modelVideo;
-        const inactiveVid = activeVideo === 'user' ? modelVideo : userVideo;
-        
-        if (Math.abs(activeVid.currentTime - inactiveVid.currentTime) > 0.1) {
-          inactiveVid.currentTime = activeVid.currentTime;
-        }
-      };
-      
-      userVideo.addEventListener('timeupdate', syncVideos);
-      modelVideo.addEventListener('timeupdate', syncVideos);
-      
-      return () => {
-        userVideo.removeEventListener('timeupdate', syncVideos);
-        modelVideo.removeEventListener('timeupdate', syncVideos);
-      };
-    }
-  }, [activeVideo, enableComparison]);
 
-  const togglePlayPause = () => {
+  const togglePlayPause = async () => {
     const userVideo = videoRef.current;
     const modelVideo = modelVideoRef.current;
     const activeVid = activeVideo === 'user' ? userVideo : modelVideo;
     
     if (!activeVid) return;
 
-    if (isPlaying) {
-      activeVid.pause();
-      if (enableComparison) {
-        userVideo?.pause();
-        modelVideo?.pause();
+    try {
+      if (isPlaying) {
+        // 現在アクティブな動画のみ一時停止
+        activeVid.pause();
+      } else {
+        // 現在アクティブな動画のみ再生
+        await activeVid.play();
       }
-    } else {
-      activeVid.play();
-      if (enableComparison) {
-        userVideo?.play();
-        modelVideo?.play();
-      }
+    } catch (error) {
+      console.error('動画の再生制御でエラーが発生しました:', error);
     }
   };
 
-  const restart = () => {
+  const restart = async () => {
     const userVideo = videoRef.current;
     const modelVideo = modelVideoRef.current;
+    const activeVid = activeVideo === 'user' ? userVideo : modelVideo;
     
-    if (userVideo) {
-      userVideo.currentTime = 0;
-      userVideo.play();
-    }
+    if (!activeVid) return;
     
-    if (enableComparison && modelVideo) {
-      modelVideo.currentTime = 0;
-      modelVideo.play();
+    try {
+      // 現在アクティブな動画のみ時間をリセット
+      activeVid.currentTime = 0;
+      // 現在アクティブな動画のみ再生
+      await activeVid.play();
+    } catch (error) {
+      console.error('動画のリスタートでエラーが発生しました:', error);
     }
   };
 
@@ -125,13 +99,10 @@ export function MobileVideoPlayer({
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percentage = x / rect.width;
+    const newTime = percentage * duration;
     
-    activeVid.currentTime = percentage * duration;
-    
-    if (enableComparison) {
-      if (userVideo) userVideo.currentTime = percentage * duration;
-      if (modelVideo) modelVideo.currentTime = percentage * duration;
-    }
+    // 現在アクティブな動画のみ時間を変更
+    activeVid.currentTime = newTime;
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -170,7 +141,8 @@ export function MobileVideoPlayer({
     >
       {enableComparison && (
         <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-4 z-20">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col items-center">
+            {title && <h3 className="text-white font-medium text-sm mb-2">{title}</h3>}
             <div className="flex items-center gap-2">
               <div className={cn(
                 "flex items-center gap-2 px-3 py-1 rounded-full transition-all",
@@ -191,7 +163,6 @@ export function MobileVideoPlayer({
                 <span className="text-sm font-medium">お手本</span>
               </div>
             </div>
-            {title && <h3 className="text-white font-medium text-sm">{title}</h3>}
           </div>
         </div>
       )}
