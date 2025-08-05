@@ -46,8 +46,8 @@ export function SwingComparison({
   const [video2, setVideo2] = useState<File | null>(null);
   const [video1Url, setVideo1Url] = useState<string>('');
   const [video2Url, setVideo2Url] = useState<string>('');
-  const [video1StoredId, setVideo1StoredId] = useState<string>('');
-  const [video2StoredId, setVideo2StoredId] = useState<string>('');
+  const [, setVideo1StoredId] = useState<string>('');
+  const [, setVideo2StoredId] = useState<string>('');
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [presetVideo2DisplayName, setPresetVideo2DisplayName] = useState<string>('');
   const [storedVideos, setStoredVideos] = useState<StoredVideo[]>([]);
