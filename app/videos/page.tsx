@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -21,7 +21,7 @@ interface Video {
   uploadedAt: Date;
 }
 
-export default function VideosPage() {
+function VideosPageContent() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [initialSlide, setInitialSlide] = useState(0);
@@ -173,5 +173,17 @@ export default function VideosPage() {
         }
       `}</style>
     </div>
+  );
+}
+
+export default function VideosPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-screen bg-black">
+        <div className="text-white">動画を読み込み中...</div>
+      </div>
+    }>
+      <VideosPageContent />
+    </Suspense>
   );
 }
