@@ -47,7 +47,9 @@
 
 | 項目名       | 機能                                    |
 | ----------- | --------------------------------------- |
-| ----        | API呼び出しはSwingComparisonコンポーネント内で実装 |
+| useSearchParams | URLパラメータからvideo2とproNameを取得 |
+| useRouter | ページ遷移（診断結果への戻る） |
+| SwingComparison | スイング比較分析機能を提供 |
 
 ## エラー／例外ケース
 
@@ -65,11 +67,12 @@
 
 | 状態／シナリオ   | 条件                            | 表示／非表示／制御内容                              | 備考                                |
 | --------------- | ------------------------------- | -------------------------------------------------- | ----------------------------------- |
-| 初期表示         | ページロード時                   | SwingComparisonコンポーネントを表示                | analysisResultはnull                |
+| 初期表示         | ページロード時                   | Suspenseフォールバック表示後、SwingComparisonを表示 | analysisResultはnull                |
+| プリセット動画設定 | URLパラメータあり             | video2とproNameパラメータを取得してプリセット | 診断結果からの連携             |
 | 分析中          | isLoadingがtrue                 | ローディング表示                                   | handleAnalyzeで制御                 |
 | 分析完了        | analysisResultが設定される       | 分析結果を表示                                     | onAnalysisCompleteで結果を受け取る   |
 | エラー発生      | errorが設定される               | エラーメッセージを表示                              | エラー時の表示制御                  |
-| 戻る操作        | onBackが呼ばれる                | 診断結果画面（/?currentStep=results）に遷移        | URLパラメータ付きで遷移             |
+| 戻る操作        | onBackが呼ばれる                | 診断結果画面（/?currentStep=results）に遷移        | router.pushで遷移             |
 
 # 画面遷移元
 
@@ -88,6 +91,8 @@
 
 # 備考
 
-- SwingComparisonコンポーネントに分析ロジックの詳細が実装されている
-- searchParamsを使用しているが、現在のコードでは実際には使用されていない
+- SuspenseでラップしてuseSearchParamsのハイドレーションエラーを防止
+- URLパラメータでvideo2とproNameを受け取り、SwingComparisonにプリセットとして渡す
+- 診断結果からの連携でプロゴルファーの動画がプリセットされる
 - 分析結果の型はAnalysisResultとして定義されている（@/lib/types/swing-analysis）
+- SwingComparisonコンポーネントに分析ロジックの詳細が実装されている
