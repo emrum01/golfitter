@@ -19,10 +19,13 @@ import {
   TrendingUp,
   Video,
   ArrowLeft,
+  BarChart3,
 } from 'lucide-react';
 import type { SwingComparisonProps } from '@/lib/types/swing-analysis';
-import { mockAnalysisResult } from '@/lib/mocks/swing-analysis';
+import { mockAnalysisResult, mockDetailedAnalysisData } from '@/lib/mocks/swing-analysis';
 import { getScoreBadgeVariant } from '@/lib/utils/score-utils';
+import { DetailedSwingAnalysis } from './detailed-swing-analysis';
+import { SwingAnalysisGraphs } from './swing-analysis-graphs';
 
 export function SwingComparison({
   onBack,
@@ -39,6 +42,7 @@ export function SwingComparison({
   const [video2Url, setVideo2Url] = useState<string>('');
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [presetVideo2DisplayName, setPresetVideo2DisplayName] = useState<string>('');
+  const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false);
   const fileInput1Ref = useRef<HTMLInputElement>(null);
   const fileInput2Ref = useRef<HTMLInputElement>(null);
 
@@ -168,6 +172,11 @@ export function SwingComparison({
               </div>
             </div>
 
+            {/* グラフ表示 */}
+            <div className="mb-6">
+              <SwingAnalysisGraphs analysisData={mockDetailedAnalysisData} />
+            </div>
+
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h4 className="font-semibold mb-2 text-green-600">強み</h4>
@@ -193,7 +202,14 @@ export function SwingComparison({
               </div>
             </div>
 
-            <div className="mt-6 flex gap-2">
+            <div className="mt-6 flex gap-2 flex-wrap">
+              <Button 
+                onClick={() => setShowDetailedAnalysis(true)}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                動画1の詳細分析
+              </Button>
               <Button onClick={handleRetry} variant="outline">
                 <RotateCcw className="h-4 w-4 mr-2" />
                 新しい動画で分析
@@ -206,6 +222,16 @@ export function SwingComparison({
           </CardContent>
         </Card>
       </div>
+    );
+  }
+
+  // 詳細分析モーダル
+  if (showDetailedAnalysis) {
+    return (
+      <DetailedSwingAnalysis
+        analysisData={mockDetailedAnalysisData}
+        onClose={() => setShowDetailedAnalysis(false)}
+      />
     );
   }
 
